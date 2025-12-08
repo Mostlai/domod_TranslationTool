@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dominions 6 Mod 汉化工作台</title>
+    <!-- 引入 Font Awesome 图标库 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
             --bg-dark: #0f0f0f;
@@ -30,7 +32,7 @@
         body {
             background-color: var(--bg-dark);
             background-image: 
-                linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)),
+                linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.75)),
                 url('https://www.transparenttextures.com/patterns/dark-matter.png');
             color: var(--text-main);
             font-family: "Segoe UI", "Microsoft YaHei", sans-serif;
@@ -42,18 +44,33 @@
 
         /* --- Header --- */
         header {
-            border-bottom: 2px solid var(--gold-dim);
+            border-bottom: 1px solid var(--gold-dim);
             padding-bottom: 15px; margin-bottom: 20px;
             display: flex; justify-content: space-between; align-items: center;
-            background: radial-gradient(circle at center, rgba(197, 160, 89, 0.1) 0%, transparent 70%);
+            background: radial-gradient(circle at center, rgba(197, 160, 89, 0.05) 0%, transparent 80%);
         }
-        h1 {
+        
+        .header-title h1 {
             color: var(--gold-primary); margin: 0;
             font-family: "Palatino Linotype", serif;
             text-shadow: 0 2px 4px rgba(0,0,0,0.8);
-            letter-spacing: 1px; font-weight: normal;
+            letter-spacing: 1px; font-weight: normal; font-size: 24px;
         }
-        .version-tag { font-size: 12px; color: var(--gold-dim); border: 1px solid var(--gold-dim); padding: 2px 6px; border-radius: 4px; margin-left: 10px; vertical-align: middle; }
+        .header-title span { font-size: 12px; color: #888; margin-top: 5px; display: block; }
+        .version-tag { font-size: 11px; color: var(--gold-dim); border: 1px solid var(--gold-dim); padding: 1px 5px; border-radius: 4px; vertical-align: middle; margin-left: 8px; }
+
+        /* GitHub Button */
+        .github-link {
+            text-decoration: none; color: #ccc;
+            background: #222; border: 1px solid #444;
+            padding: 8px 15px; border-radius: 20px;
+            font-size: 14px; transition: all 0.3s;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .github-link:hover {
+            color: #fff; border-color: var(--gold-primary);
+            background: #333; box-shadow: 0 0 10px rgba(197, 160, 89, 0.2);
+        }
 
         /* --- Control Panel --- */
         .control-panel {
@@ -83,11 +100,13 @@
             background: rgba(0,0,0,0.3); padding: 12px; border-radius: 6px; border: 1px solid #333;
         }
         .config-group { display: flex; flex-direction: column; gap: 6px; }
+        
         .head { 
             font-size: 12px; font-weight: bold; color: #ccc; 
             border-bottom: 1px solid #444; padding-bottom: 4px; margin-bottom: 4px; 
-            display: flex; align-items: center; gap: 6px;
+            display: flex; align-items: center; gap: 8px;
         }
+        .head i { width: 16px; text-align: center; } /* Fixed width icons */
         
         /* Advanced Options */
         .advanced-options {
@@ -115,14 +134,14 @@
             padding: 10px 15px; cursor: pointer; font-weight: 600; font-size: 13px;
             border-radius: 4px; transition: all 0.2s; text-align: center;
             box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-            position: relative; overflow: hidden;
+            position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; gap: 8px;
         }
         .btn:hover { transform: translateY(-1px); box-shadow: 0 4px 8px rgba(0,0,0,0.3); border-color: var(--gold-dim); color: #fff; }
         .btn:active { transform: translateY(0); }
         
         .btn-primary { 
             background: linear-gradient(135deg, #5e1111 0%, #3b0808 100%); 
-            color: #ffddd0; border-color: #8a2be2; border-color: #a63434;
+            color: #ffddd0; border-color: #a63434;
         }
         .btn-success { background: linear-gradient(135deg, #1b3a1b 0%, #0d1f0d 100%); border-color: #2e7d32; color: #a5d6a7; }
         .btn-purple { background: linear-gradient(135deg, #4527a0 0%, #311b92 100%); border-color: #7c4dff; color: #d1c4e9; }
@@ -137,8 +156,9 @@
         
         .tab-btn {
             background: #1a1a1a; border: 1px solid #333; border-bottom: none;
-            color: #888; padding: 8px 20px; cursor: pointer; font-size: 12px; font-weight: bold;
+            color: #888; padding: 8px 18px; cursor: pointer; font-size: 12px; font-weight: bold;
             border-radius: 6px 6px 0 0; transition: 0.2s; position: relative; top: 1px;
+            display: flex; align-items: center; gap: 6px;
         }
         .tab-btn:hover { background: #252525; color: #ddd; }
         .tab-btn.active { 
@@ -189,14 +209,13 @@
         tr:nth-child(even) { background: rgba(255,255,255,0.015); }
         tr:hover { background: rgba(197, 160, 89, 0.05); }
 
-        /* Textarea Styling */
         textarea {
             width: 98%; 
             background: #0a0a0a; color: #e0e0e0;
             border: 1px solid #333; border-radius: 4px;
             padding: 8px; resize: vertical; font-family: inherit; line-height: 1.5;
             transition: all 0.2s;
-            overflow: hidden; /* Hide scrollbar, use auto-resize */
+            overflow: hidden; 
             min-height: 38px;
         }
         textarea:focus { 
@@ -262,66 +281,70 @@
 <body>
 
 <header>
-    <h1>Dominions 6 Mod 汉化工作台 <span class="version-tag">v2.5</span></h1>
-    <div style="font-size:12px; color:#888;">全局同步</div>
+    <div class="header-title">
+        <h1>Dominions 6 Mod 汉化工作台v2.6</h1>
+    </div>
+    <a href="https://github.com/Mostlai/domod_TranslationTool/tree/main" target="_blank" class="github-link">
+        <i class="fa-brands fa-github fa-lg"></i> GitHub
+    </a>
 </header>
 
 <div class="control-panel">
     <!-- 1. File -->
     <div class="col-file">
-        <span class="col-title">1. 文件操作</span>
+        <span class="col-title"><i class="fa-solid fa-file-code"></i> 1. 文件操作</span>
         <select id="encodingSelect">
             <option value="UTF-8">读取编码: UTF-8</option>
             <option value="windows-1252">读取编码: Windows-1252</option>
         </select>
         <input type="file" id="fileInput" accept=".dm" style="display:none">
-        <button class="btn" onclick="document.getElementById('fileInput').click()">📂 上传 .dm 文件</button>
+        <button class="btn" onclick="document.getElementById('fileInput').click()"><i class="fa-solid fa-folder-open"></i> 上传 .dm 文件</button>
     </div>
 
     <!-- 2. Config -->
     <div class="col-config" style="grid-column: span 1;">
-        <span class="col-title">2. 翻译范围</span>
+        <span class="col-title"><i class="fa-solid fa-sliders"></i> 2. 翻译范围</span>
         <div class="config-grid">
             <!-- Spells -->
             <div class="config-group">
-                <div class="head" style="color:#ab82ff"><span style="font-size:14px">🔮</span> 法术</div>
+                <div class="head" style="color:#ab82ff"><i class="fa-solid fa-hat-wizard"></i> 法术</div>
                 <label><input type="checkbox" id="cfg_spell_name"> Name</label>
                 <label><input type="checkbox" id="cfg_spell_descr" checked> Descr</label>
             </div>
             <!-- Units -->
             <div class="config-group">
-                <div class="head" style="color:#ff4444"><span style="font-size:14px">⚔️</span> 单位</div>
+                <div class="head" style="color:#ff4444"><i class="fa-solid fa-chess-knight"></i> 单位</div>
                 <label><input type="checkbox" id="cfg_unit_name"> Name</label>
                 <label><input type="checkbox" id="cfg_unit_descr" checked> Descr</label>
             </div>
             <!-- Items -->
             <div class="config-group">
-                <div class="head" style="color:#ffd700"><span style="font-size:14px">🛡️</span> 物品</div>
+                <div class="head" style="color:#ffd700"><i class="fa-solid fa-shield-halved"></i> 物品</div>
                 <label><input type="checkbox" id="cfg_item_name"> Name</label>
                 <label><input type="checkbox" id="cfg_item_descr" checked> Descr</label>
             </div>
             <!-- Sites -->
             <div class="config-group">
-                <div class="head" style="color:#00ced1"><span style="font-size:14px">🏛️</span> 遗迹</div>
+                <div class="head" style="color:#00ced1"><i class="fa-solid fa-dungeon"></i> 遗迹</div>
                 <label><input type="checkbox" id="cfg_site_name"> Name</label>
                 <label><input type="checkbox" id="cfg_site_descr" checked> Descr</label>
             </div>
             <!-- Nation -->
             <div class="config-group">
-                <div class="head" style="color:#1e88e5"><span style="font-size:14px">🚩</span> 国家</div>
+                <div class="head" style="color:#1e88e5"><i class="fa-solid fa-flag"></i> 国家</div>
                 <label><input type="checkbox" id="cfg_nation_name"> Name</label>
                 <label title="注意：称号(Epithet)不参与全局替换"><input type="checkbox" id="cfg_nation_epithet" checked> Epithet</label>
                 <label><input type="checkbox" id="cfg_nation_descr" checked> Info</label>
             </div>
             <!-- Events -->
             <div class="config-group">
-                <div class="head" style="color:#4caf50"><span style="font-size:14px">📜</span> 事件</div>
+                <div class="head" style="color:#4caf50"><i class="fa-solid fa-scroll"></i> 事件</div>
                 <label><input type="checkbox" id="cfg_event_name"> Name</label>
                 <label><input type="checkbox" id="cfg_event_descr" checked> Msg</label>
             </div>
             <!-- Misc -->
             <div class="config-group">
-                <div class="head" style="color:#ccc"><span style="font-size:14px">🌐</span> 杂项</div>
+                <div class="head" style="color:#ccc"><i class="fa-solid fa-layer-group"></i> 杂项</div>
                 <label><input type="checkbox" id="cfg_misc_name"> Name</label>
                 <label><input type="checkbox" id="cfg_misc_descr" checked> Text</label>
             </div>
@@ -330,34 +353,33 @@
                 <label title="推荐！覆盖所有指令中的同名引用（Epithet 除外）"><input type="checkbox" id="opt_global_sync" checked style="accent-color:#00e676"> <b>启用全局名称同步</b></label>
                 <div style="width:1px; height:15px; background:#444; margin:0 5px;"></div>
                 <label title="仅针对 Descr/Msg 等长文本，每隔N个字强制插入换行符(\n)"><input type="checkbox" id="opt_auto_wrap" checked style="accent-color:#ff4444"> <b>强制换行: 每 <input type="number" id="wrap_limit" value="55"> 字</b></label>
-                <!-- Removed Anti-Clip Checkbox as per request -->
             </div>
         </div>
     </div>
 
     <!-- 3. Actions -->
     <div class="col-actions">
-        <span class="col-title" style="text-align:center">3. 执行操作</span>
-        <button class="btn btn-purple" onclick="openAIPromptModal()">🧠 AI 提示词</button>
-        <button class="btn btn-success" onclick="document.getElementById('importModal').classList.add('active')">📥 导入翻译</button>
-        <button class="btn btn-fix" onclick="autoFixSwappedNames()">🔮 智能修复错位</button>
-        <button class="btn btn-primary" onclick="generateModFile()">⚡ 生成 Mod</button>
+        <span class="col-title" style="text-align:center"><i class="fa-solid fa-play"></i> 3. 执行操作</span>
+        <button class="btn btn-purple" onclick="openAIPromptModal()"><i class="fa-solid fa-brain"></i> AI 提示词</button>
+        <button class="btn btn-success" onclick="document.getElementById('importModal').classList.add('active')"><i class="fa-solid fa-file-import"></i> 导入翻译</button>
+        <button class="btn btn-fix" onclick="autoFixSwappedNames()"><i class="fa-solid fa-wand-magic-sparkles"></i> 智能修复</button>
+        <button class="btn btn-primary" onclick="generateModFile()"><i class="fa-solid fa-bolt"></i> 生成 Mod</button>
     </div>
 </div>
 
 <!-- Filter Bar -->
 <div class="filter-bar">
-    <button class="tab-btn active" onclick="setFilter('all')" data-cat="all">全部</button>
-    <button class="tab-btn" onclick="setFilter('unit')" data-cat="unit">单位</button>
-    <button class="tab-btn" onclick="setFilter('spell')" data-cat="spell">法术</button>
-    <button class="tab-btn" onclick="setFilter('item')" data-cat="item">物品</button>
-    <button class="tab-btn" onclick="setFilter('site')" data-cat="site">遗迹</button>
-    <button class="tab-btn" onclick="setFilter('nation')" data-cat="nation">国家</button>
-    <button class="tab-btn" onclick="setFilter('event')" data-cat="event">事件</button>
-    <button class="tab-btn" onclick="setFilter('misc')" data-cat="misc">杂项</button>
+    <button class="tab-btn active" onclick="setFilter('all')" data-cat="all"><i class="fa-solid fa-border-all"></i> 全部</button>
+    <button class="tab-btn" onclick="setFilter('unit')" data-cat="unit"><i class="fa-solid fa-chess-knight"></i> 单位</button>
+    <button class="tab-btn" onclick="setFilter('spell')" data-cat="spell"><i class="fa-solid fa-hat-wizard"></i> 法术</button>
+    <button class="tab-btn" onclick="setFilter('item')" data-cat="item"><i class="fa-solid fa-shield-halved"></i> 物品</button>
+    <button class="tab-btn" onclick="setFilter('site')" data-cat="site"><i class="fa-solid fa-dungeon"></i> 遗迹</button>
+    <button class="tab-btn" onclick="setFilter('nation')" data-cat="nation"><i class="fa-solid fa-flag"></i> 国家</button>
+    <button class="tab-btn" onclick="setFilter('event')" data-cat="event"><i class="fa-solid fa-scroll"></i> 事件</button>
+    <button class="tab-btn" onclick="setFilter('misc')" data-cat="misc"><i class="fa-solid fa-layer-group"></i> 杂项</button>
 
     <div class="search-container">
-        <span style="font-size:14px;">🔍</span>
+        <i class="fa-solid fa-magnifying-glass" style="color:#555"></i>
         <input type="text" class="search-input" id="searchInput" placeholder="搜索 ID / 原文 / 指令..." oninput="filterData()">
         <div class="counter" id="rowCounter">0 / 0</div>
     </div>
@@ -367,10 +389,10 @@
     <table id="dataTable">
         <thead>
             <tr>
-                <th width="80">分类/ID</th>
+                <th width="80">ID / 上下文</th>
                 <th width="100">指令</th>
                 <th width="40%">原文</th>
-                <th>译文</th>
+                <th>译文 (高度自适应)</th>
             </tr>
         </thead>
         <tbody id="tableBody">
@@ -382,8 +404,8 @@
 <div class="pagination-bar">
     <div class="page-info" id="pageInfo">第 1 / 1 页 (0 条)</div>
     <div class="page-ctrls">
-        <button class="page-btn" id="prevBtn" onclick="changePage(-1)">◀ 上一页</button>
-        <button class="page-btn" id="nextBtn" onclick="changePage(1)">下一页 ▶</button>
+        <button class="page-btn" id="prevBtn" onclick="changePage(-1)"><i class="fa-solid fa-chevron-left"></i> 上一页</button>
+        <button class="page-btn" id="nextBtn" onclick="changePage(1)">下一页 <i class="fa-solid fa-chevron-right"></i></button>
     </div>
 </div>
 
@@ -391,7 +413,7 @@
 <div id="aiPromptModal" class="modal">
     <div class="modal-box">
         <h3 style="color:#e1bee7; margin-top:0; display:flex; justify-content:space-between;">
-            <span>AI 提示词生成</span>
+            <span><i class="fa-solid fa-robot"></i> AI 提示词生成</span>
             <span id="aiCount" style="font-size:12px; color:#aaa; font-weight:normal; margin-top:5px;"></span>
         </h3>
         
@@ -407,7 +429,7 @@
         <textarea id="aiPromptText" style="height:300px; font-family:monospace; color:#e1bee7; border-color:#7c4dff;" readonly></textarea>
         <div style="margin-top:10px; text-align:right;">
             <button class="btn" onclick="document.getElementById('aiPromptModal').classList.remove('active')">关闭</button>
-            <button class="btn btn-purple" onclick="copyAIPrompt()">复制</button>
+            <button class="btn btn-purple" onclick="copyAIPrompt()"><i class="fa-regular fa-copy"></i> 复制</button>
         </div>
     </div>
 </div>
@@ -415,11 +437,11 @@
 <!-- Import Modal -->
 <div id="importModal" class="modal">
     <div class="modal-box">
-        <h3 style="color:var(--gold-primary); margin-top:0;">导入翻译结果</h3>
-        <textarea id="pasteArea" style="height:350px; font-family:monospace;" placeholder="Ctrl+V 粘贴..."></textarea>
+        <h3 style="color:var(--gold-primary); margin-top:0;"><i class="fa-solid fa-paste"></i> 导入翻译结果</h3>
+        <textarea id="pasteArea" style="height:350px; font-family:monospace;" placeholder="请在此处粘贴 AI 返回的内容 (Ctrl+V)..."></textarea>
         <div style="margin-top:10px; text-align:right;">
             <button class="btn" onclick="document.getElementById('importModal').classList.remove('active')">关闭</button>
-            <button class="btn btn-primary" onclick="processImport()">确认导入</button>
+            <button class="btn btn-primary" onclick="processImport()"><i class="fa-solid fa-check"></i> 确认导入</button>
         </div>
     </div>
 </div>
@@ -750,6 +772,8 @@
                      let parts = clean.match(regex);
                      if(parts) finalTrans = parts.join('\n');
                 }
+
+                // REMOVED Anti-Clip logic here
 
                 newLines[d.startLine] = `${d.cmd} "${finalTrans}"`;
                 for(let k = d.startLine + 1; k <= d.endLine; k++) {
