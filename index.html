@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dominions 6 Mod 汉化工作台 (v8.0 AI提示词版)</title>
+    <style>
+        :root {
+            --bg-color: #121212;
+            --panel-bg: #1e1e1e;
+            --gold: #d4af37;
+            --gold-dim: #7a6030;
+            --text: #e0e0e0;
+            --border: 1px solid #444;
+            /* Category Colors */
+            --tag-unit: #8b2e2e; --tag-spell: #5d3f82; 
+            --tag-item: #b8860b; --tag-site: #2f4f4f;
+            --tag-event: #2e7d32; --tag-nation: #1e88e5; --tag-misc: #555;
+        }
+
+        body {
+            background: var(--bg-color) url('https://www.transparenttextures.com/patterns/dark-matter.png');
+            color: var(--text); font-family: "Segoe UI", sans-serif;
+            margin: 0; padding: 20px; display: flex; flex-direction: column; height: 98vh;
+        }
+
+        /* Header */
+        header { border-bottom: 2px solid var(--gold-dim); padding-bottom: 15px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
+        h1 { color: var(--gold); margin: 0; font-family: "Palatino Linotype", serif; text-shadow: 2px 2px 0 #000; letter-spacing: 1px; }
+
+        /* Control Panel */
+        .control-panel {
+            background: var(--panel-bg); border: var(--border); padding: 15px;
+            display: grid; grid-template-columns: 240px 1fr 180px; gap: 20px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.6); margin-bottom: 15px;
+        }
+
+        .col-file { display: flex; flex-direction: column; gap: 10px; border-right: 1px solid #333; padding-right: 15px; justify-content: center; }
+        select { background: #000; color: #fff; border: 1px solid #555; padding: 5px; width: 100%; cursor: pointer; }
+
+        /* Configuration Grid */
+        .config-grid {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;
+            background: #151515; padding: 10px; border: 1px solid #333; border-radius: 4px;
+        }
+        .config-group { display: flex; flex-direction: column; gap: 3px; background: rgba(255,255,255,0.03); padding: 5px; border-radius: 3px; }
+        .head { font-size: 11px; font-weight: bold; text-transform: uppercase; border-bottom: 1px solid #444; margin-bottom: 3px; padding-bottom: 2px; display: flex; align-items: center; gap: 5px; }
+        
+        .advanced-options {
+            grid-column: span 4; border-top: 1px solid #444; margin-top: 5px; padding-top: 5px;
+            display: flex; gap: 15px; align-items: center; background: #222; padding: 8px; border-radius: 4px;
+        }
+
+        label { font-size: 11px; display: flex; align-items: center; gap: 6px; cursor: pointer; color: #bbb; transition: 0.2s; white-space: nowrap; }
+        label:hover { color: #fff; }
+        input[type="checkbox"] { accent-color: var(--gold); }
+
+        .col-actions { display: flex; flex-direction: column; gap: 10px; justify-content: center; padding-left: 10px; border-left: 1px solid #333; }
+
+        .btn {
+            background: #2d2d2d; color: var(--gold); border: 1px solid var(--gold-dim);
+            padding: 8px 10px; cursor: pointer; font-weight: bold; font-size: 12px; text-align: center;
+            transition: all 0.2s; white-space: nowrap;
+        }
+        .btn:hover { background: #444; border-color: #fff; transform: translateY(-1px); }
+        .btn-primary { background: linear-gradient(#5e1111, #3b0808); color: #fff; border-color: #a63434; font-size: 13px; padding: 10px; }
+        .btn-success { background: linear-gradient(#1e3c1e, #0f1f0f); border-color: #2e8b57; color: #90ee90; }
+        .btn-purple { background: linear-gradient(#4a148c, #311b92); border-color: #7c4dff; color: #e1bee7; } /* AI Button Color */
+
+        /* Filter Bar */
+        .filter-bar {
+            display: flex; gap: 5px; margin-bottom: 0; background: #1a1a1a; 
+            padding: 8px 10px 0 10px; border: 1px solid #444; border-bottom: none;
+            align-items: center;
+        }
+        
+        .tab-btn {
+            background: #222; border: 1px solid #444; border-bottom: none;
+            color: #888; padding: 8px 15px; cursor: pointer; font-size: 12px; font-weight: bold;
+            border-radius: 4px 4px 0 0; transition: 0.2s; position: relative; top: 1px;
+        }
+        .tab-btn:hover { background: #333; color: #ddd; }
+        .tab-btn.active { background: rgba(30,30,30,0.9); color: #fff; border-color: var(--gold-dim); border-bottom: 1px solid rgba(30,30,30,0.9); z-index: 2; }
+        
+        .tab-btn[data-cat="all"].active { border-top: 3px solid var(--gold); }
+        .tab-btn[data-cat="unit"].active { border-top: 3px solid var(--tag-unit); }
+        .tab-btn[data-cat="spell"].active { border-top: 3px solid var(--tag-spell); }
+        .tab-btn[data-cat="item"].active { border-top: 3px solid var(--tag-item); }
+        .tab-btn[data-cat="site"].active { border-top: 3px solid var(--tag-site); }
+        .tab-btn[data-cat="nation"].active { border-top: 3px solid var(--tag-nation); }
+        .tab-btn[data-cat="event"].active { border-top: 3px solid var(--tag-event); }
+        .tab-btn[data-cat="misc"].active { border-top: 3px solid var(--tag-misc); }
+
+        .search-box { margin-left: auto; position: relative; }
+        .search-input {
+            background: #000; border: 1px solid #555; color: #fff;
+            padding: 6px 10px; border-radius: 15px; font-size: 12px; width: 200px;
+            transition: 0.2s;
+        }
+        .search-input:focus { border-color: var(--gold); outline: none; width: 250px; }
+        .counter { font-size: 11px; color: #666; margin-left: 10px; min-width: 100px; text-align: right;}
+
+        /* Table */
+        .table-wrap { flex: 1; overflow-y: auto; border: var(--border); background: rgba(30,30,30,0.9); position: relative; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        th { background: #181818; color: var(--gold); padding: 10px; position: sticky; top: 0; text-align: left; z-index: 5; border-bottom: 1px solid var(--gold-dim); }
+        td { padding: 6px 10px; border-bottom: 1px solid #333; vertical-align: top; line-height: 1.4; }
+        tr:hover td { background: #252525; }
+
+        textarea {
+            width: 98%; min-height: 28px; background: #0b0b0b; color: #ddd;
+            border: 1px solid #444; padding: 4px; resize: vertical; font-family: inherit;
+        }
+        textarea:focus { border-color: var(--gold); outline: none; background: #000; }
+
+        .badge { padding: 2px 5px; border-radius: 3px; font-size: 10px; color: #fff; font-weight: bold; display: inline-block; min-width: 35px; text-align: center; margin-right: 5px; box-shadow: 1px 1px 2px black;}
+        .bg-unit { background: var(--tag-unit); } .bg-spell { background: var(--tag-spell); }
+        .bg-item { background: var(--tag-item); } .bg-site { background: var(--tag-site); }
+        .bg-event { background: var(--tag-event); } .bg-nation { background: var(--tag-nation); }
+        .bg-misc { background: var(--tag-misc); }
+        .alert-dupe { color: #ff5555; font-size: 10px; border: 1px solid #ff5555; padding: 0 3px; border-radius: 2px; margin-right:5px; }
+
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 100; justify-content: center; align-items: center; }
+        .modal.active { display: flex; }
+        .modal-box { background: #222; border: 2px solid var(--gold); padding: 20px; width: 700px; box-shadow: 0 0 40px #000; display: flex; flex-direction: column; gap: 10px;}
+
+        #toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: #333; border: 1px solid var(--gold); padding: 12px 24px; opacity: 0; transition: 0.3s; pointer-events: none; z-index: 200; border-radius: 4px; box-shadow: 0 5px 15px #000; }
+        #toast.show { opacity: 1; bottom: 50px; }
+    </style>
+</head>
+<body>
+
+<header>
+    <div>
+        <h1>Dominions 6 Mod 汉化工作台</h1>
+        <div style="font-size:12px; color:#888;">AI 辅助 | 智能修复 | 格式保护</div>
+    </div>
+</header>
+
+<div class="control-panel">
+    <!-- 1. File -->
+    <div class="col-file">
+        <label style="color:var(--gold); font-weight:bold;">1. 文件操作</label>
+        <select id="encodingSelect">
+            <option value="UTF-8">读取编码: UTF-8</option>
+            <option value="windows-1252">读取编码: Windows-1252</option>
+        </select>
+        <input type="file" id="fileInput" accept=".dm" style="display:none">
+        <button class="btn" onclick="document.getElementById('fileInput').click()">📂 上传 .dm 文件</button>
+    </div>
+
+    <!-- 2. Config -->
+    <div class="config-grid">
+        <!-- Spells -->
+        <div class="config-group">
+            <div class="head" style="color:#ab82ff">🔮 法术</div>
+            <label><input type="checkbox" id="cfg_spell_name"> Name</label>
+            <label><input type="checkbox" id="cfg_spell_descr" checked> Descr</label>
+        </div>
+        <!-- Units -->
+        <div class="config-group">
+            <div class="head" style="color:#ff4444">⚔️ 单位</div>
+            <label><input type="checkbox" id="cfg_unit_name"> Name</label>
+            <label><input type="checkbox" id="cfg_unit_descr" checked> Descr</label>
+        </div>
+        <!-- Items -->
+        <div class="config-group">
+            <div class="head" style="color:#ffd700">🛡️ 物品</div>
+            <label><input type="checkbox" id="cfg_item_name"> Name</label>
+            <label><input type="checkbox" id="cfg_item_descr" checked> Descr</label>
+        </div>
+        <!-- Sites -->
+        <div class="config-group">
+            <div class="head" style="color:#00ced1">🏛️ 遗迹</div>
+            <label><input type="checkbox" id="cfg_site_name"> Name</label>
+            <label><input type="checkbox" id="cfg_site_descr" checked> Descr</label>
+        </div>
+        <!-- Nation -->
+        <div class="config-group">
+            <div class="head" style="color:#1e88e5">🚩 国家</div>
+            <label><input type="checkbox" id="cfg_nation_name"> Name</label>
+            <label><input type="checkbox" id="cfg_nation_descr" checked> Info</label>
+        </div>
+        <!-- Events -->
+        <div class="config-group">
+            <div class="head" style="color:#4caf50">📜 事件</div>
+            <label><input type="checkbox" id="cfg_event_name"> Name</label>
+            <label><input type="checkbox" id="cfg_event_descr" checked> Msg</label>
+        </div>
+        <!-- Misc -->
+        <div class="config-group">
+            <div class="head" style="color:#ccc">🌐 杂项</div>
+            <label><input type="checkbox" id="cfg_misc_name"> Name</label>
+            <label><input type="checkbox" id="cfg_misc_descr" checked> Text</label>
+        </div>
+
+        <div class="advanced-options">
+            <span style="color:var(--gold); font-size:11px; font-weight:bold;">⚡ 高级:</span>
+            <label title="自动替换 #startsite 和 #futuresite 中的引用"><input type="checkbox" id="opt_link_sites" checked> 自动更新遗迹引用 (Reference)</label>
+        </div>
+    </div>
+
+    <!-- 3. Actions -->
+    <div class="col-actions">
+        <!-- New AI Button -->
+        <button class="btn btn-purple" onclick="generateAIPrompt()">2. AI 提示词导出</button>
+        <button class="btn btn-success" onclick="document.getElementById('importModal').classList.add('active')">3. 导入翻译结果</button>
+        <button class="btn btn-primary" onclick="generateModFile()">⚡ 生成 Mod</button>
+    </div>
+</div>
+
+<!-- Filter Bar -->
+<div class="filter-bar">
+    <button class="tab-btn active" onclick="setFilter('all')" data-cat="all">全部</button>
+    <button class="tab-btn" onclick="setFilter('unit')" data-cat="unit">单位</button>
+    <button class="tab-btn" onclick="setFilter('spell')" data-cat="spell">法术</button>
+    <button class="tab-btn" onclick="setFilter('item')" data-cat="item">物品</button>
+    <button class="tab-btn" onclick="setFilter('site')" data-cat="site">遗迹</button>
+    <button class="tab-btn" onclick="setFilter('nation')" data-cat="nation">国家</button>
+    <button class="tab-btn" onclick="setFilter('event')" data-cat="event">事件</button>
+    <button class="tab-btn" onclick="setFilter('misc')" data-cat="misc">杂项</button>
+
+    <div class="search-box">
+        <input type="text" class="search-input" id="searchInput" placeholder="搜索 ID / 原文 / 指令..." oninput="renderTable()">
+    </div>
+    <div class="counter" id="rowCounter">0 / 0</div>
+</div>
+
+<div class="table-wrap">
+    <table id="dataTable">
+        <thead>
+            <tr>
+                <th width="80">分类/ID</th>
+                <th width="100">指令</th>
+                <th width="40%">原文</th>
+                <th>译文</th>
+            </tr>
+        </thead>
+        <tbody id="tableBody">
+            <tr><td colspan="4" style="text-align:center; padding:50px; color:#666;">等待上传...</td></tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- AI Prompt Modal -->
+<div id="aiPromptModal" class="modal">
+    <div class="modal-box">
+        <h3 style="color:#e1bee7; margin-top:0;">AI 提示词生成 (Prompt Mode)</h3>
+        <p style="font-size:12px; color:#aaa; margin:0;">
+            提示：为避免 AI 上下文溢出，建议配合“标签页”分批导出（如先导出法术，再导出物品）。
+            <br>请将下方内容完整复制给 ChatGPT / Claude / Kimi，并将 AI 的回复粘贴回“导入”窗口。
+        </p>
+        <textarea id="aiPromptText" style="height:350px; font-family:monospace; color:#e1bee7; border-color:#7c4dff;" readonly></textarea>
+        <div style="margin-top:10px; text-align:right;">
+            <button class="btn" onclick="document.getElementById('aiPromptModal').classList.remove('active')">关闭</button>
+            <button class="btn btn-purple" onclick="copyAIPrompt()">复制提示词</button>
+        </div>
+    </div>
+</div>
+
+<!-- Import Modal -->
+<div id="importModal" class="modal">
+    <div class="modal-box">
+        <h3 style="color:var(--gold); margin-top:0;">导入翻译结果</h3>
+        <p style="font-size:12px; color:#aaa; margin:0;">支持直接粘贴 AI 的回复内容，或者浏览器翻译后的网页内容。</p>
+        <textarea id="pasteArea" style="height:350px; font-family:monospace;" placeholder="Ctrl+V 粘贴..."></textarea>
+        <div style="margin-top:10px; text-align:right;">
+            <button class="btn" onclick="document.getElementById('importModal').classList.remove('active')">关闭</button>
+            <button class="btn btn-primary" onclick="processImport()">确认导入</button>
+        </div>
+    </div>
+</div>
+
+<div id="toast">Ready</div>
+
+<script>
+    let originalLines = [], extractedData = [], nameFrequency = {}, originalFileName = "mod", detectedLineEnding = "\n", currentFilter = 'all';
+
+    const typeMap = {
+        '#newmonster': {cat:'unit', l:'单位', c:'bg-unit'}, '#selectmonster': {cat:'unit', l:'单位', c:'bg-unit'},
+        '#newweapon': {cat:'item', l:'武器', c:'bg-item'}, '#selectweapon': {cat:'item', l:'武器', c:'bg-item'},
+        '#newarmor': {cat:'item', l:'防具', c:'bg-item'}, '#selectarmor': {cat:'item', l:'防具', c:'bg-item'},
+        '#newitem': {cat:'item', l:'宝物', c:'bg-item'}, '#selectitem': {cat:'item', l:'宝物', c:'bg-item'},
+        '#newspell': {cat:'spell', l:'法术', c:'bg-spell'}, '#selectspell': {cat:'spell', l:'法术', c:'bg-spell'},
+        '#newsite': {cat:'site', l:'遗迹', c:'bg-site'}, '#selectsite': {cat:'site', l:'遗迹', c:'bg-site'},
+        '#selectnation': {cat:'nation', l:'国家', c:'bg-nation'},
+        '#newevent': {cat:'event', l:'事件', c:'bg-event'}, '#selectevent': {cat:'event', l:'事件', c:'bg-event'},
+    };
+    
+    const targetCmds = ['#name', '#landname', '#itemname', '#modname', '#descr', '#description', '#msg', '#text', '#killermsg', '#summary', '#brief'];
+    const refCmds = ['#startsite', '#futuresite'];
+
+    document.getElementById('fileInput').addEventListener('change', e => {
+        const f = e.target.files[0];
+        if(!f) return;
+        originalFileName = f.name.replace(/\.dm$/i, "");
+        const encoding = document.getElementById('encodingSelect').value;
+        const r = new FileReader();
+        r.onload = e => parseDM(e.target.result);
+        r.readAsText(f, encoding);
+    });
+
+    function parseDM(text) {
+        detectedLineEnding = text.indexOf('\r\n') > -1 ? '\r\n' : '\n';
+        originalLines = text.split(/\r?\n/);
+        extractedData = [];
+        nameFrequency = {};
+
+        originalLines.forEach(l => {
+            const m = l.match(/^#name\s+"([^"]*)"/); 
+            if(m) nameFrequency[m[1]] = (nameFrequency[m[1]]||0)+1;
+        });
+
+        let ctxCmd = "Global", ctxId = "";
+        originalLines.forEach((line, index) => {
+            const trimLine = line.trim();
+            if(!trimLine.startsWith('#')) return;
+
+            const parts = trimLine.split(' ');
+            if(parts[0].startsWith('#new') || parts[0].startsWith('#select') || typeMap[parts[0]]) {
+                ctxCmd = parts[0];
+                ctxId = parts.length > 1 ? parts[1] : "";
+            }
+
+            const match = trimLine.match(/^(#\w+)\s+"([^"]*)"/);
+            if(match && targetCmds.includes(match[1])) {
+                const cmd = match[1];
+                const content = match[2];
+                const typeInfo = typeMap[ctxCmd] || {cat:'misc', l:'杂项', c:'bg-misc'};
+
+                let cmdType = 'other';
+                if(['#name','#landname','#itemname','#modname'].includes(cmd)) cmdType = 'name';
+                else if(['#descr','#description','#msg','#text','#killermsg','#summary','#brief'].includes(cmd)) cmdType = 'descr';
+
+                extractedData.push({
+                    lineIdx: index,
+                    id: extractedData.length,
+                    type: typeInfo,
+                    cmdType: cmdType,
+                    ctxId: ctxId,
+                    cmd: cmd,
+                    orig: content,
+                    trans: "",
+                    isDupe: (cmd === '#name' && nameFrequency[content] > 1)
+                });
+            }
+        });
+        setFilter('all');
+        showToast(`加载成功：${extractedData.length} 条数据`);
+    }
+
+    function setFilter(cat) {
+        currentFilter = cat;
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.classList.remove('active');
+            if(btn.dataset.cat === cat) btn.classList.add('active');
+        });
+        renderTable();
+    }
+
+    function renderTable() {
+        const tbody = document.getElementById('tableBody');
+        const searchStr = document.getElementById('searchInput').value.toLowerCase();
+        
+        if(!extractedData.length) { tbody.innerHTML = '<tr><td colspan="4" style="text-align:center">无数据</td></tr>'; return; }
+        
+        let html = "";
+        let visibleCount = 0;
+
+        extractedData.forEach(d => {
+            if (currentFilter !== 'all' && d.type.cat !== currentFilter) return;
+            if (searchStr) {
+                const matchId = (d.ctxId || "").toLowerCase().includes(searchStr);
+                const matchOrig = d.orig.toLowerCase().includes(searchStr);
+                const matchCmd = d.cmd.toLowerCase().includes(searchStr);
+                if (!matchId && !matchOrig && !matchCmd) return;
+            }
+
+            visibleCount++;
+            if (visibleCount > 1000) return;
+
+            const warn = d.isDupe ? `<span class="alert-dupe">重名</span>` : '';
+            html += `<tr>
+                <td><span class="badge ${d.type.c}">${d.type.l}</span><span style="font-size:10px; color:#666">${d.ctxId}</span></td>
+                <td style="color:#8abeb7; font-family:monospace;">${d.cmd}</td>
+                <td style="color:#aaa;">${warn}${escapeHtml(d.orig)}</td>
+                <td><textarea id="t_${d.id}" oninput="updateTrans(${d.id}, this.value)">${d.trans}</textarea></td>
+            </tr>`;
+        });
+
+        if (visibleCount > 1000) html += `<tr><td colspan="4" style="text-align:center; color:#ff5555;">结果过多，仅显示前 1000 条。</td></tr>`;
+        else if (visibleCount === 0) html = `<tr><td colspan="4" style="text-align:center; color:#666;">没有匹配的结果</td></tr>`;
+
+        tbody.innerHTML = html;
+        document.getElementById('rowCounter').innerText = `显示: ${visibleCount} / 总计: ${extractedData.length}`;
+    }
+
+    function updateTrans(id, val) { extractedData[id].trans = cleanText(val); }
+
+    function cleanText(t) {
+        if(!t) return "";
+        return t.replace(/[\r\n]+/g, "\\n").replace(/\\ n/g, "\\n").replace(/\/ n/g, "\\n")
+                .replace(/“/g, "'").replace(/”/g, "'").replace(/"/g, "'").trim();
+    }
+
+    function shouldInclude(item) {
+        const cat = item.type.cat;
+        const cfgName = document.getElementById(`cfg_${cat}_name`)?.checked;
+        const cfgDescr = document.getElementById(`cfg_${cat}_descr`)?.checked;
+        if (cfgName === undefined || cfgDescr === undefined) return false;
+        if(item.cmdType === 'name' && !cfgName) return false;
+        if(item.cmdType === 'descr' && !cfgDescr) return false;
+        return true;
+    }
+
+    // --- AI Prompt Logic ---
+    function generateAIPrompt() {
+        if(!extractedData.length) return showToast("请先上传文件");
+        
+        // System Prompt
+        const promptHeader = 
+`你是一位精通策略游戏《Dominions 6》(神域6) 的专业本地化翻译专家。请帮我将以下 Mod 文本翻译成简体中文。
+
+【核心规则】
+1. 格式必须严格保持不变：每行开头是 {{ID:数字}}，后面紧跟原文。请输出 {{ID:数字}} 加上 翻译后的文本。
+2. 绝对不要翻译、修改或删除 {{ID:xxx}} 标签。
+3. 请以代码块格式输出结果，以便我复制。
+4. 遇到游戏术语请保持专业性（如 MR=魔法抗性, Protection=防御值）。
+5. 风格要求：史诗感、奇幻风格、信达雅。
+6. 如果一行原文为空，请直接输出对应的 ID 标签即可。
+
+【待翻译内容】：
+`;
+
+        let content = "";
+        let count = 0;
+        
+        extractedData.forEach(d => {
+            // 只导出符合当前复选框配置 且 符合当前标签页筛选 的内容
+            // 这样用户可以通过切换标签页来分批处理
+            if(shouldInclude(d) && (currentFilter === 'all' || d.type.cat === currentFilter) && !d.trans) {
+                content += `{{ID:${d.id}}} ${d.orig}\n`;
+                count++;
+            }
+        });
+
+        if(count === 0) return showToast("当前筛选范围内没有需要翻译的内容（或已被翻译）");
+        if(count > 1000) showToast(`注意：当前导出了 ${count} 条文本，可能超过 AI 单次回复长度，建议使用标签页分批导出。`);
+
+        document.getElementById('aiPromptText').value = promptHeader + content;
+        document.getElementById('aiPromptModal').classList.add('active');
+    }
+
+    function copyAIPrompt() {
+        const el = document.getElementById('aiPromptText');
+        el.select();
+        document.execCommand('copy');
+        showToast("已复制提示词！请去 AI 处粘贴。");
+    }
+
+    // --- Export / Import / Generate ---
+    function generateModFile() {
+        if(!extractedData.length) return;
+        let newLines = [...originalLines];
+        let modifyCount = 0;
+        let siteTranslationMap = {}; 
+
+        extractedData.forEach(d => {
+            if(d.trans && shouldInclude(d)) {
+                const line = newLines[d.lineIdx];
+                newLines[d.lineIdx] = line.replace(`"${d.orig}"`, `"${d.trans}"`);
+                modifyCount++;
+                if (document.getElementById('opt_link_sites').checked && d.type.cat === 'site' && d.cmd === '#name') {
+                    siteTranslationMap[d.orig] = d.trans;
+                }
+            }
+        });
+
+        if (document.getElementById('opt_link_sites').checked && Object.keys(siteTranslationMap).length > 0) {
+            newLines = newLines.map(line => {
+                const trimLine = line.trim();
+                if (!trimLine.startsWith('#')) return line;
+                const match = trimLine.match(/^(#\w+)\s+"([^"]*)"/);
+                if (match) {
+                    const cmd = match[1];
+                    const content = match[2];
+                    if (refCmds.includes(cmd) && siteTranslationMap[content]) {
+                        return line.replace(`"${content}"`, `"${siteTranslationMap[content]}"`);
+                    }
+                }
+                return line;
+            });
+        }
+
+        const finalContent = newLines.join(detectedLineEnding);
+        const blob = new Blob(["\uFEFF" + finalContent], {type: "text/plain;charset=utf-8"});
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = `${originalFileName}_CN.dm`;
+        a.click();
+        showToast(`生成成功！已修改 ${modifyCount} 行`);
+    }
+
+    function exportBridgeHTML() {
+        if(!extractedData.length) return;
+        let html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Trans</title><style>p{margin:5px 0; padding:8px; border-left:3px solid gold; background:#f4f4f4; font-family:sans-serif;}</style></head><body><h3>请翻译此页面，然后全选复制。</h3>`;
+        extractedData.forEach(d => {
+            if(shouldInclude(d) && (currentFilter === 'all' || d.type.cat === currentFilter)) {
+                html += `<p>{{ID:${d.id}}}${escapeHtml(d.orig)}</p>\n`;
+            }
+        });
+        html += "</body></html>";
+        const a = document.createElement('a'); a.href=URL.createObjectURL(new Blob([html],{type:'text/html'})); 
+        a.download="translate_bridge.html"; a.click();
+    }
+
+    function processImport() {
+        const text = document.getElementById('pasteArea').value;
+        const regex = /\{\{ID[:：](\d+)\}\}\s*(.*)/gi;
+        let count = 0;
+        text.split('\n').forEach(l => {
+            regex.lastIndex=0; const m=regex.exec(l);
+            if(m) {
+                const id = parseInt(m[1]);
+                const tr = cleanText(m[2]);
+                if(extractedData[id] && tr && tr!==cleanText(extractedData[id].orig)) {
+                    extractedData[id].trans = tr;
+                    const el=document.getElementById('t_'+id); if(el) el.value=tr;
+                    count++;
+                }
+            }
+        });
+        document.getElementById('importModal').classList.remove('active');
+        showToast(`导入并修复 ${count} 条数据`);
+        renderTable(); 
+    }
+
+    function escapeHtml(t) { return t.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+    function showToast(m) { const t=document.getElementById('toast'); t.innerText=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3000); }
+</script>
+</body>
+</html>
