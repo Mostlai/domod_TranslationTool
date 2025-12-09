@@ -106,21 +106,27 @@
             border-bottom: 1px solid #444; padding-bottom: 4px; margin-bottom: 4px; 
             display: flex; align-items: center; gap: 8px;
         }
-        .head i { width: 16px; text-align: center; } /* Fixed width icons */
+        .head i { width: 16px; text-align: center; } 
         
         /* Advanced Options */
         .advanced-options {
             grid-column: span 4; border-top: 1px solid #444; margin-top: 5px; padding-top: 10px;
-            display: flex; gap: 20px; align-items: center; flex-wrap: wrap;
+            display: flex; gap: 15px; align-items: flex-start;
         }
         
-        label { font-size: 12px; display: flex; align-items: center; gap: 6px; cursor: pointer; color: #aaa; transition: 0.2s; }
+        .adv-block {
+            flex: 1; display: flex; flex-direction: column; gap: 8px;
+            background: rgba(255,255,255,0.02); padding: 8px; border-radius: 4px; border: 1px solid #333;
+        }
+        .adv-title { font-size: 11px; color: var(--gold-primary); font-weight: bold; margin-bottom: 2px; }
+
+        label { font-size: 12px; display: flex; align-items: center; gap: 6px; cursor: pointer; color: #aaa; transition: 0.2s; white-space: nowrap;}
         label:hover { color: #fff; }
         input[type="checkbox"], input[type="radio"] { accent-color: var(--gold-primary); cursor: pointer; }
         
         input[type="number"] { 
             background: #000; color: var(--gold-primary); border: 1px solid #555; 
-            width: 40px; padding: 2px 0; text-align: center; font-weight: bold; border-radius: 3px;
+            width: 45px; padding: 2px 0; text-align: center; font-weight: bold; border-radius: 3px;
         }
         input[type="number"]:focus { border-color: var(--gold-primary); outline: none; }
 
@@ -141,7 +147,7 @@
         
         .btn-primary { 
             background: linear-gradient(135deg, #5e1111 0%, #3b0808 100%); 
-            color: #ffddd0; border-color: #a63434;
+            color: #ffddd0; border-color: #8a2be2; border-color: #a63434;
         }
         .btn-success { background: linear-gradient(135deg, #1b3a1b 0%, #0d1f0d 100%); border-color: #2e7d32; color: #a5d6a7; }
         .btn-purple { background: linear-gradient(135deg, #4527a0 0%, #311b92 100%); border-color: #7c4dff; color: #d1c4e9; }
@@ -282,7 +288,7 @@
 
 <header>
     <div class="header-title">
-        <h1>Dominions 6 Mod 汉化工作台v2.6</h1>
+        <h1>Dominions 6 Mod 汉化工作台 <span class="version-tag">v2.7</span></h1>
     </div>
     <a href="https://github.com/Mostlai/domod_TranslationTool/tree/main" target="_blank" class="github-link">
         <i class="fa-brands fa-github fa-lg"></i> GitHub
@@ -350,9 +356,19 @@
             </div>
 
             <div class="advanced-options">
-                <label title="推荐！覆盖所有指令中的同名引用（Epithet 除外）"><input type="checkbox" id="opt_global_sync" checked style="accent-color:#00e676"> <b>启用全局名称同步</b></label>
-                <div style="width:1px; height:15px; background:#444; margin:0 5px;"></div>
-                <label title="仅针对 Descr/Msg 等长文本，每隔N个字强制插入换行符(\n)"><input type="checkbox" id="opt_auto_wrap" checked style="accent-color:#ff4444"> <b>强制换行: 每 <input type="number" id="wrap_limit" value="55"> 字</b></label>
+                <div class="adv-block">
+                    <span class="adv-title"><i class="fa-solid fa-link"></i> 全局替换</span>
+                    <label title="推荐！覆盖所有指令中的同名引用（Epithet 除外）"><input type="checkbox" id="opt_global_sync" checked style="accent-color:#00e676"> 启用全局名称同步</label>
+                </div>
+                <div class="adv-block">
+                    <span class="adv-title"><i class="fa-solid fa-align-left"></i> 强制换行设置 (字数)</span>
+                    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                        <label>国家: <input type="number" id="limit_nation" value="60"></label>
+                        <label>法术: <input type="number" id="limit_spell" value="36"></label>
+                        <label>单位/其他: <input type="number" id="limit_unit" value="46"></label>
+                    </div>
+                    <label title="如果勾选，即使不翻译（使用原文），生成Mod时也会强制去除原换行并按新规则重排"><input type="checkbox" id="opt_force_reformat" style="accent-color:#ff4444"> 即使未翻译也强制重排</label>
+                </div>
             </div>
         </div>
     </div>
@@ -478,7 +494,7 @@
         r.readAsText(f, encoding);
     });
 
-    // --- Parser (Multi-line) ---
+    // --- Parser ---
     function parseDM(text) {
         detectedLineEnding = text.indexOf('\r\n') > -1 ? '\r\n' : '\n';
         originalLines = text.split(/\r?\n/);
@@ -631,7 +647,7 @@
         }
     }
 
-    // --- Render with Auto-Height Textarea ---
+    // --- Render ---
     function renderTable() {
         const tbody = document.getElementById('tableBody');
         const totalItems = filteredIndices.length;
@@ -667,16 +683,13 @@
         });
         tbody.innerHTML = html;
         
-        // Post-render: Auto resize all textareas to match content or original height
         setTimeout(() => {
             pageIndices.forEach(idx => {
                 const el = document.getElementById(`t_${extractedData[idx].id}`);
                 if(el) {
-                    // Initial sizing: roughly match Original height if empty, or content height if filled
                     const origLines = extractedData[idx].orig.split(/\r\n|\r|\n/).length;
-                    const minHeight = Math.max(38, origLines * 18); // Approx 18px per line
+                    const minHeight = Math.max(38, origLines * 18); 
                     el.style.height = minHeight + 'px';
-                    // If content exists, fit to content
                     if(el.value) autoResize(el);
                 }
             });
@@ -757,23 +770,44 @@
         let modifyCount = 0;
         let globalTranslationMap = {}; 
 
-        const useAutoWrap = document.getElementById('opt_auto_wrap').checked;
         const useGlobalSync = document.getElementById('opt_global_sync').checked;
-        const wrapLimit = parseInt(document.getElementById('wrap_limit').value) || 55;
+        const forceReformat = document.getElementById('opt_force_reformat').checked;
+        
+        // Get specific limits
+        const limitNation = parseInt(document.getElementById('limit_nation').value) || 55;
+        const limitSpell = parseInt(document.getElementById('limit_spell').value) || 36;
+        const limitUnit = parseInt(document.getElementById('limit_unit').value) || 42;
 
         extractedData.forEach(d => {
-            if(d.trans && shouldInclude(d)) {
-                let finalTrans = d.trans;
+            // Logic: If translated OR (Force Reformat AND Config Checked)
+            let textToUse = null;
+            if (d.trans) textToUse = d.trans;
+            else if (forceReformat && shouldInclude(d)) textToUse = d.orig;
+
+            if (textToUse !== null && shouldInclude(d)) {
+                let finalTrans = textToUse;
                 
-                // Force Newline Wrap
-                if(useAutoWrap && d.cmdType === 'descr' && finalTrans.length > wrapLimit) {
-                     let clean = finalTrans.replace(/\r?\n/g, ''); 
-                     let regex = new RegExp(`.{1,${wrapLimit}}`, 'g');
-                     let parts = clean.match(regex);
-                     if(parts) finalTrans = parts.join('\n');
+                // --- Force Reformat / Auto Wrap ---
+                if (d.cmdType === 'descr') {
+                    // Determine limit
+                    let limit = 42; 
+                    if (d.type.cat === 'nation') limit = limitNation;
+                    else if (d.type.cat === 'spell') limit = limitSpell;
+                    else limit = limitUnit;
+
+                    // Clean existing newlines first if force reformatting logic implies reflow
+                    // To safely reflow English/Chinese mix, we might just strip \n and re-chunk
+                    let clean = finalTrans.replace(/\r?\n/g, ''); 
+                    
+                    // Regex to split every N chars
+                    if (clean.length > limit) {
+                        let regex = new RegExp(`.{1,${limit}}`, 'g');
+                        let parts = clean.match(regex);
+                        if(parts) finalTrans = parts.join('\n');
+                    }
                 }
 
-                // REMOVED Anti-Clip logic here
+                // REMOVED Anti-Clip logic
 
                 newLines[d.startLine] = `${d.cmd} "${finalTrans}"`;
                 for(let k = d.startLine + 1; k <= d.endLine; k++) {
@@ -782,8 +816,8 @@
                 modifyCount++;
 
                 // Global Sync (Excluding Epithet)
-                if (d.cmdType === 'name' && d.cmd !== '#epithet' && useGlobalSync) {
-                    globalTranslationMap[d.orig] = finalTrans;
+                if (d.cmdType === 'name' && d.cmd !== '#epithet' && useGlobalSync && d.trans) {
+                    globalTranslationMap[d.orig] = d.trans; // Only sync translated names
                 }
             }
         });
