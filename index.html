@@ -258,7 +258,7 @@
 
 <header>
     <div class="header-left">
-        <h1>Dominions 6 Mod 汉化工作台 <span class="version-tag">v3.2</span></h1>
+        <h1>Dominions 6 Mod 汉化工作台 <span class="version-tag">v3.3</span></h1>
     </div>
     <div class="header-actions">
         <button class="theme-toggle" onclick="toggleTheme()" title="切换日夜模式"><i class="fa-solid fa-moon"></i></button>
@@ -335,7 +335,10 @@
                         </div>
                         <div style="height:1px; background:var(--border-color); margin:2px 0;"></div>
                         <label title="即使不翻译，也对原文进行强制换行处理"><input type="checkbox" id="opt_force_reformat"> 强制重排原文</label>
-                        <label title="忽略重名条目"><input type="checkbox" id="opt_ignore_dupes" style="accent-color:#ff4444"> 🚫 忽略重名条目</label>
+                        <div style="display:flex; gap:15px;">
+                            <label title="忽略重名条目"><input type="checkbox" id="opt_ignore_dupes" style="accent-color:#ff4444"> 🚫 忽略重名条目</label>
+                            <label title="忽略原文中包含[]的条目（如[Basic Imperial Harmony]），不显示也不导出"><input type="checkbox" id="opt_ignore_brackets"> 🚫 忽略含 [ ] 的文本</label>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -569,7 +572,6 @@
             let line = originalLines[i].trim();
             if (!line.startsWith('#')) continue;
 
-            // Robust split for command and ID
             const parts = line.split(/\s+/);
             const currentCmd = parts[0];
 
@@ -740,6 +742,10 @@
     function updateTrans(id, val) { extractedData[id].trans = val; }
 
     function shouldInclude(item) {
+        // Brackets Filter
+        const ignoreBrackets = document.getElementById('opt_ignore_brackets').checked;
+        if (ignoreBrackets && /\[.*\]/.test(item.orig)) return false;
+
         if (item.isDupe && document.getElementById('opt_ignore_dupes').checked) return false;
         const cat = item.type.cat;
         if (item.cmd === '#epithet') return document.getElementById('cfg_nation_epithet')?.checked || false;
@@ -759,7 +765,7 @@
 
     function regenerateAIPrompt() {
         const scope = document.querySelector('input[name="aiScope"]:checked').value;
-        const promptHeader = `你是一位精通策略游戏《Dominions 6》(神域6) 的专业本地化翻译专家。请帮我将以下 Mod 文本翻译成简体中文。\n【核心规则】\n1. 格式必须严格保持不变：每行开头是 {{ID:数字}}，后面紧跟原文。请输出 {{ID:数字}} 加上 翻译后的文本。\n2. 绝对不要翻译、修改或删除 {{ID:xxx}} 标签。\n3. 请以代码块格式输出结果。\n4. 遇到游戏术语请保持专业性（如 MR=魔法抗性, Protection=防御值）。\n5. 风格要求：史诗感、奇幻风格、信达雅。\n6. 如果原文包含换行符，请在译文中也保持换行。\n\n【待翻译内容】：\n`;
+        const promptHeader = `你是一位精通策略游戏《Dominions 6》(神域6) 的专业本地化翻译专家。请帮我将以下 Mod 文本翻译成简体中文。\n【核心规则】\n1. 格式必须严格保持不变：每行开头是 {{ID:数字}}，后面紧跟原文。请输出 {{ID:数字}} 加上 翻译后的文本。\n2. 绝对不要翻译、修改或删除 {{ID:xxx}} 标签。\n3. 请以代码块格式输出结果。\n4. 遇到游戏术语请保持专业性（如 MR=魔法抗性, Protection=防御值）。\n5. 风格要求：史诗感、奇幻风格、信达雅。\n6. 如果原文包含换行符，请在译文中也保持换行。\n7. 如果原文包含方括号 \`[]\` (例如 \`[Condition]\`)，请保持原文不要翻译，或者只翻译方括号之外的部分，绝对不要修改方括号内的内容。\n8. 保留所有 \`##...##\` 格式的变量名不要翻译。\n\n【待翻译内容】：\n`;
         let content = "", count = 0;
         const iterateList = scope === 'all' ? extractedData.map((d, i) => i) : filteredIndices;
         iterateList.forEach(idx => {
