@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dominions 6 Mod 汉化工作台</title>
+    <title>Dominions 6 Mod 汉化工作台 </title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -146,16 +146,16 @@
         input[type="checkbox"], input[type="radio"] { accent-color: var(--gold-primary); cursor: pointer; }
         
         input[type="number"] { 
-            background: var(--input-bg); color: var(--gold-primary); border: 1px solid var(--border-color); 
+            background: var(--input-bg); color: var(--gold-primary); border: 1px solid #555; 
             width: 40px; padding: 2px; text-align: center; font-weight: bold; border-radius: 4px;
         }
         input[type="number"]:focus { border-color: var(--gold-primary); outline: none; }
 
         /* Actions */
-        .col-actions { display: flex; flex-direction: column; gap: 10px; justify-content: center; }
+        .col-actions { display: flex; flex-direction: column; gap: 8px; justify-content: center; }
         .btn {
             background: var(--input-bg); color: var(--text-main); border: 1px solid var(--border-color);
-            padding: 10px; cursor: pointer; font-weight: 600; font-size: 12px;
+            padding: 8px; cursor: pointer; font-weight: 600; font-size: 12px;
             border-radius: 6px; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 6px;
         }
         .btn:hover { transform: translateY(-2px); box-shadow: var(--shadow-hover); border-color: var(--gold-primary); }
@@ -164,6 +164,8 @@
         .btn-success { background: linear-gradient(135deg, #2e7d32, #1b5e20); color: white; border: none; }
         .btn-purple { background: linear-gradient(135deg, #6200ea, #311b92); color: white; border: none; }
         .btn-fix { background: linear-gradient(135deg, #ff6f00, #e65100); color: white; border: none; }
+        .btn-teal { background: linear-gradient(135deg, #00838f, #006064); color: white; border: none; }
+        .btn-patch { background: linear-gradient(135deg, #424242, #212121); border: 1px solid var(--gold-dim); color: var(--gold-primary); }
 
         /* Filter Bar */
         .filter-bar { display: flex; gap: 4px; padding: 0 10px; align-items: flex-end; }
@@ -177,7 +179,7 @@
             border-top: 3px solid var(--gold-primary); border-bottom: 1px solid var(--panel-bg); 
             z-index: 5; padding-bottom: 10px; margin-top: -2px;
         }
-        /* Active borders */
+        .tab-btn[data-cat="all"].active { border-top: 3px solid var(--gold-primary); }
         .tab-btn[data-cat="unit"].active { border-top-color: var(--tag-unit); color: var(--tag-unit); }
         .tab-btn[data-cat="spell"].active { border-top-color: var(--tag-spell); color: var(--tag-spell); }
         .tab-btn[data-cat="item"].active { border-top-color: var(--tag-item); color: var(--tag-item); }
@@ -194,12 +196,7 @@
         .search-input { background: transparent; border: none; color: var(--text-main); width: 140px; font-size: 12px; outline: none; }
         .search-input:focus { width: 200px; }
         .counter { font-size: 11px; color: var(--text-dim); }
-
-        /* Filter Dropdown */
-        .filter-select {
-            background: transparent; border: none; color: var(--text-dim); font-size: 12px; 
-            outline: none; cursor: pointer; border-right: 1px solid var(--border-color); padding-right: 8px; margin-right: 5px;
-        }
+        .filter-select { background: transparent; border: none; color: var(--text-dim); font-size: 12px; outline: none; cursor: pointer; border-right: 1px solid var(--border-color); padding-right: 8px; margin-right: 5px; }
         .filter-select option { background: var(--input-bg); color: var(--text-main); }
 
         /* Table */
@@ -253,13 +250,15 @@
             display: flex; align-items: center; gap: 10px;
         }
         #toast.show { opacity: 1; bottom: 60px; }
+        
+        .glossary-group { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
     </style>
 </head>
 <body>
 
 <header>
     <div class="header-left">
-        <h1>Dominions 6 Mod 汉化工作台 <span class="version-tag">v2.9</span></h1>
+        <h1>Dominions 6 Mod 汉化工作台 <span class="version-tag">v3.0</span></h1>
     </div>
     <div class="header-actions">
         <button class="theme-toggle" onclick="toggleTheme()" title="切换日夜模式"><i class="fa-solid fa-moon"></i></button>
@@ -320,9 +319,9 @@
                         <input type="checkbox" id="opt_auto_wrap" checked style="accent-color:#ff4444">
                         <span style="font-size:12px; color:var(--text-dim)">强制换行字数:</span>
                         <div style="display:flex; gap:5px;">
-                            <label title="国家Info/Brief">国家:<input type="number" id="limit_nation" value="55"></label>
-                            <label title="法术Descr">法术:<input type="number" id="limit_spell" value="36"></label>
-                            <label title="单位/物品/其他">单位/其他:<input type="number" id="limit_other" value="42"></label>
+                            <label title="国家Info/Brief">国:<input type="number" id="limit_nation" value="55"></label>
+                            <label title="法术Descr">法:<input type="number" id="limit_spell" value="36"></label>
+                            <label title="单位/物品/其他">他:<input type="number" id="limit_other" value="42"></label>
                         </div>
                     </div>
                     <div style="border-top:1px solid var(--border-color); padding-top:5px; display:flex; flex-direction:column; gap:5px;">
@@ -337,10 +336,21 @@
     <!-- 3. Actions -->
     <div class="col-actions">
         <span class="col-title" style="text-align:center"><i class="fa-solid fa-bolt"></i> 3. 执行操作</span>
-        <button class="btn btn-purple" onclick="openAIPromptModal()"><i class="fa-solid fa-robot"></i> AI 提示词</button>
+        <button class="btn btn-purple" onclick="openAIPromptModal()"><i class="fa-solid fa-brain"></i> AI 提示词</button>
         <button class="btn btn-success" onclick="document.getElementById('importModal').classList.add('active')"><i class="fa-solid fa-file-import"></i> 导入翻译</button>
-        <button class="btn btn-fix" onclick="autoFixSwappedNames()"><i class="fa-solid fa-wand-magic-sparkles"></i> 智能修复</button>
-        <button class="btn btn-primary" onclick="generateModFile()"><i class="fa-solid fa-download"></i> 生成 Mod</button>
+        
+        <!-- Dictionary Group -->
+        <div class="glossary-group">
+            <button class="btn btn-teal" onclick="exportGlossary()"><i class="fa-solid fa-file-export"></i> 导出词库</button>
+            <input type="file" id="glossaryInput" accept=".json" style="display:none">
+            <button class="btn btn-teal" onclick="document.getElementById('glossaryInput').click()"><i class="fa-solid fa-book"></i> 导入词库</button>
+        </div>
+
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px;">
+            <button class="btn btn-fix" onclick="autoFixSwappedNames()"><i class="fa-solid fa-wand-magic-sparkles"></i> 智能修复</button>
+            <button class="btn btn-patch" onclick="generatePatchMod()" title="生成只包含select指令和翻译的补丁Mod"><i class="fa-solid fa-bandage"></i> 生成补丁</button>
+        </div>
+        <button class="btn btn-primary" onclick="generateModFile()"><i class="fa-solid fa-download"></i> 生成完整 Mod</button>
     </div>
 </div>
 
@@ -362,7 +372,7 @@
             <option value="no_cn">⬜ 纯外</option>
         </select>
         <i class="fa-solid fa-magnifying-glass" style="color:var(--text-dim)"></i>
-        <input type="text" class="search-input" id="searchInput" placeholder="搜索内容..." oninput="filterData()">
+        <input type="text" class="search-input" id="searchInput" placeholder="搜索 ID / 原文 / 指令..." oninput="filterData()">
         <div class="counter" id="rowCounter">0 / 0</div>
     </div>
 </div>
@@ -374,7 +384,7 @@
                 <th width="80">ID / 上下文</th>
                 <th width="100">指令</th>
                 <th width="40%">原文</th>
-                <th>译文</th>
+                <th>译文 (Auto-Height)</th>
             </tr>
         </thead>
         <tbody id="tableBody">
@@ -437,7 +447,7 @@
     let originalLines = [], extractedData = [], nameFrequency = {}, originalFileName = "mod", detectedLineEnding = "\n";
     let currentFilter = 'all', currentPage = 1, filteredIndices = [];
     const itemsPerPage = 100;
-    const cnRegex = /[\u4e00-\u9fa5]/; // Chinese char detection
+    const cnRegex = /[\u4e00-\u9fa5]/;
 
     const typeMap = {
         '#newmonster': {cat:'unit', l:'单位', c:'bg-unit'}, '#selectmonster': {cat:'unit', l:'单位', c:'bg-unit'},
@@ -451,7 +461,19 @@
     };
     const targetCmds = ['#name', '#landname', '#itemname', '#modname', '#descr', '#description', '#msg', '#text', '#killermsg', '#summary', '#brief', '#epithet'];
     const noReplaceCmds = targetCmds; 
+    
+    // Patch Command Mapping
+    const patchCmdMap = {
+        '#newmonster': '#selectmonster', '#selectmonster': '#selectmonster',
+        '#newweapon': '#selectweapon', '#selectweapon': '#selectweapon',
+        '#newarmor': '#selectarmor', '#selectarmor': '#selectarmor',
+        '#newitem': '#selectitem', '#selectitem': '#selectitem',
+        '#newspell': '#selectspell', '#selectspell': '#selectspell',
+        '#newsite': '#selectsite', '#selectsite': '#selectsite',
+        '#selectnation': '#selectnation'
+    };
 
+    // --- Helpers ---
     function toggleSyncMatrix(el) {
         document.querySelectorAll('.sync-item input').forEach(b => b.checked = el.checked);
     }
@@ -465,6 +487,53 @@
         r.readAsText(f, document.getElementById('encodingSelect').value);
     });
 
+    // --- Glossary Logic ---
+    document.getElementById('glossaryInput').addEventListener('change', e => {
+        const f = e.target.files[0];
+        if(!f) return;
+        const r = new FileReader();
+        r.onload = function(e) {
+            try {
+                const glossary = JSON.parse(e.target.result);
+                let count = 0;
+                extractedData.forEach(d => {
+                    if (!d.trans && glossary[d.orig]) {
+                        d.trans = glossary[d.orig];
+                        count++;
+                    }
+                });
+                showToast(`已从词库导入 ${count} 条翻译`);
+                filterData();
+            } catch(err) {
+                alert("词库文件格式错误！");
+            }
+        };
+        r.readAsText(f, 'UTF-8');
+    });
+
+    function exportGlossary() {
+        if(!extractedData.length) return showToast("没有数据可导出");
+        let glossary = {};
+        let count = 0;
+        extractedData.forEach(d => {
+            if(d.trans && d.trans.trim() !== "") {
+                glossary[d.orig] = d.trans;
+                count++;
+            }
+        });
+        
+        if(count === 0) return showToast("当前没有任何翻译内容");
+
+        const jsonStr = JSON.stringify(glossary, null, 2);
+        const blob = new Blob([jsonStr], {type: "application/json;charset=utf-8"});
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = `Dom6_Glossary_${new Date().toISOString().slice(0,10)}.json`;
+        a.click();
+        showToast(`已导出词库，包含 ${count} 条目`);
+    }
+
+    // --- Parser ---
     function parseDM(text) {
         detectedLineEnding = text.indexOf('\r\n') > -1 ? '\r\n' : '\n';
         originalLines = text.split(/\r?\n/);
@@ -490,10 +559,16 @@
             let line = originalLines[i].trim();
             if (!line.startsWith('#')) continue;
 
-            const parts = line.split(' ');
-            if (parts[0].startsWith('#new') || parts[0].startsWith('#select') || typeMap[parts[0]]) {
-                ctxCmd = parts[0];
-                ctxId = parts.length > 1 ? parts[1] : "";
+            const parts = line.split(/\s+/);
+            const currentCmd = parts[0];
+
+            if (currentCmd.startsWith('#new') || currentCmd.startsWith('#select') || typeMap[currentCmd]) {
+                ctxCmd = currentCmd;
+                if (parts.length > 1 && /^-?\d+$/.test(parts[1])) {
+                    ctxId = parts[1];
+                } else {
+                    ctxId = ""; 
+                }
             }
 
             const cmdMatch = line.match(/^(#\w+)\s+"(.*)/); 
@@ -529,10 +604,11 @@
                     if(['#name','#landname','#itemname','#modname','#epithet'].includes(cmd)) cmdType = 'name';
                     else if(['#descr','#description','#msg','#text','#killermsg','#summary','#brief'].includes(cmd)) cmdType = 'descr';
 
+                    const isDupe = nameFrequency[fullContent.toLowerCase()] > 1;
                     extractedData.push({
                         startLine, endLine, id: extractedData.length,
-                        type: typeInfo, cmdType, ctxId, cmd, orig: fullContent, trans: "",
-                        isDupe: (cmd === '#name' && nameFrequency[fullContent.toLowerCase()] > 1)
+                        type: typeInfo, cmdType, ctxId, ctxCmd, cmd, orig: fullContent, trans: "",
+                        isDupe: isDupe
                     });
                 }
             }
@@ -579,18 +655,13 @@
         const langFilter = document.getElementById('langFilter').value;
 
         filteredIndices = extractedData.map((d, idx) => {
-            // Category Check
             if (currentFilter !== 'all' && d.type.cat !== currentFilter) return -1;
-            
-            // Search Check
             if (searchStr) {
                 const matchId = (d.ctxId || "").toLowerCase().includes(searchStr);
                 const matchOrig = d.orig.toLowerCase().includes(searchStr);
                 const matchCmd = d.cmd.toLowerCase().includes(searchStr);
                 if (!matchId && !matchOrig && !matchCmd) return -1;
             }
-
-            // Language Check
             const textToCheck = (d.trans || "") + d.orig;
             const hasCN = cnRegex.test(textToCheck);
             if (langFilter === 'has_cn' && !hasCN) return -1;
@@ -600,7 +671,6 @@
         }).filter(idx => idx !== -1);
         
         currentPage = 1;
-        // Update Counter
         const countText = document.getElementById('rowCounter');
         if (searchStr || currentFilter !== 'all' || langFilter !== 'all') {
             countText.innerText = `${filteredIndices.length} / ${extractedData.length}`;
@@ -635,7 +705,7 @@
             const warn = d.isDupe ? `<span class="alert-dupe" title="重名引用"><i class="fa-solid fa-triangle-exclamation"></i> 引用</span>` : '';
             let displayOrig = escapeHtml(d.orig).replace(/\n/g, '<br><span style="color:var(--gold-dim)">↵</span>');
             html += `<tr>
-                <td><span class="badge ${d.type.c}">${d.type.l}</span><div style="font-size:10px; color:var(--text-dim); margin-top:2px;">${d.ctxId}</div></td>
+                <td><span class="badge ${d.type.c}">${d.type.l}</span><div style="font-size:10px; color:var(--text-dim); margin-top:4px;">${d.ctxId}</div></td>
                 <td style="color:var(--text-dim); font-family:monospace; font-weight:bold;">${d.cmd}</td>
                 <td style="color:var(--text-dim); font-size:13px;">${warn}${displayOrig}</td>
                 <td><textarea id="t_${d.id}" oninput="autoResize(this); updateTrans(${d.id}, this.value)" onfocus="autoResize(this)">${d.trans}</textarea></td>
@@ -691,6 +761,63 @@
 
     function copyAIPrompt() { document.getElementById('aiPromptText').select(); document.execCommand('copy'); showToast("已复制提示词！"); }
 
+    // --- Patch Generation ---
+    function generatePatchMod() {
+        if(!extractedData.length) return showToast("没有数据！");
+        
+        let patchContent = `#modname "${originalFileName.replace(/_/g, ' ')} CN Patch"\n#description "Translation patch for ${originalFileName}"\n#domversion 600\n\n`;
+        let patches = new Map();
+
+        const useAutoWrap = document.getElementById('opt_auto_wrap').checked;
+        const limitNation = parseInt(document.getElementById('limit_nation').value) || 55;
+        const limitSpell = parseInt(document.getElementById('limit_spell').value) || 36;
+        const limitOther = parseInt(document.getElementById('limit_other').value) || 42;
+
+        extractedData.forEach(d => {
+            if (!d.trans || !shouldInclude(d) || !d.ctxId) return;
+
+            let selectCmd = patchCmdMap[d.ctxCmd];
+            if (!selectCmd) return;
+
+            let key = `${selectCmd} ${d.ctxId}`;
+            if (!patches.has(key)) patches.set(key, []);
+
+            let finalTrans = d.trans;
+            if (d.cmdType === 'descr' && useAutoWrap) {
+                let limit = limitOther; 
+                if (d.type.cat === 'nation') limit = limitNation;
+                else if (d.type.cat === 'spell') limit = limitSpell;
+
+                let paragraphs = finalTrans.split(/\r?\n/);
+                let processed = paragraphs.map(p => {
+                    if(p.length <= limit) return p;
+                    let regex = new RegExp(`.{1,${limit}}`, 'g');
+                    let chunks = p.match(regex);
+                    return chunks ? chunks.join('\n') : p;
+                });
+                finalTrans = processed.join('\n');
+            }
+
+            patches.get(key).push(`${d.cmd} "${finalTrans}"`);
+        });
+
+        if (patches.size === 0) return showToast("没有找到可生成补丁的翻译内容");
+
+        patches.forEach((cmds, key) => {
+            patchContent += `${key}\n`;
+            cmds.forEach(c => patchContent += `${c}\n`);
+            patchContent += `#end\n\n`;
+        });
+
+        const blob = new Blob(["\uFEFF" + patchContent], {type: "text/plain;charset=utf-8"});
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = `${originalFileName}_Patch.dm`;
+        a.click();
+        showToast(`补丁生成成功！`);
+    }
+
+    // --- Full Mod Generation ---
     function generateModFile() {
         if(!extractedData.length) return;
         let newLines = [...originalLines];
@@ -717,12 +844,14 @@
                     else if (d.type.cat === 'spell') limit = limitSpell;
 
                     if (useAutoWrap || forceReformat) {
-                        let clean = finalTrans.replace(/\r?\n/g, ''); 
-                        if (clean.length > limit) {
+                        let paragraphs = finalTrans.split(/\r?\n/);
+                        let processed = paragraphs.map(p => {
+                            if(p.length <= limit) return p;
                             let regex = new RegExp(`.{1,${limit}}`, 'g');
-                            let parts = clean.match(regex);
-                            if(parts) finalTrans = parts.join('\n');
-                        }
+                            let chunks = p.match(regex);
+                            return chunks ? chunks.join('\n') : p;
+                        });
+                        finalTrans = processed.join('\n');
                     }
                 }
 
@@ -730,7 +859,6 @@
                 for(let k = d.startLine + 1; k <= d.endLine; k++) { newLines[k] = "__DELETED_LINE__"; }
                 modifyCount++;
 
-                // Global Sync Map Builder
                 if (useGlobalSync && d.cmdType === 'name' && d.trans) {
                     let allowSync = false;
                     if (d.type.cat === 'unit' && document.getElementById('sync_unit_name').checked) allowSync = true;
