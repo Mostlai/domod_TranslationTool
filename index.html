@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dominions 6 Mod 汉化工作台 </title>
+    <title>Dominions 6 Mod 汉化工作台</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -24,7 +24,7 @@
             /* Category Colors */
             --tag-unit: #ef5350; --tag-spell: #ab47bc; 
             --tag-item: #fdd835; --tag-site: #26a69a;
-            --tag-event: #66bb6a; --tag-nation: #42a5f5; --tag-misc: #78909c;
+            --tag-event: #2e7d32; --tag-nation: #42a5f5; --tag-misc: #78909c;
         }
 
         [data-theme="light"] {
@@ -258,7 +258,7 @@
 
 <header>
     <div class="header-left">
-        <h1>Dominions 6 Mod 汉化工作台 <span class="version-tag">v3.0</span></h1>
+        <h1>Dominions 6 Mod 汉化工作台 <span class="version-tag">v3.2</span></h1>
     </div>
     <div class="header-actions">
         <button class="theme-toggle" onclick="toggleTheme()" title="切换日夜模式"><i class="fa-solid fa-moon"></i></button>
@@ -318,13 +318,22 @@
                     <div style="display:flex; align-items:center; gap:8px; margin-bottom:5px;">
                         <input type="checkbox" id="opt_auto_wrap" checked style="accent-color:#ff4444">
                         <span style="font-size:12px; color:var(--text-dim)">强制换行字数:</span>
-                        <div style="display:flex; gap:5px;">
+                        <div style="display:flex; gap:5px; flex-wrap:wrap;">
                             <label title="国家Info/Brief">国:<input type="number" id="limit_nation" value="55"></label>
                             <label title="法术Descr">法:<input type="number" id="limit_spell" value="36"></label>
+                            <label title="事件Msg">事:<input type="number" id="limit_event" value="35"></label>
                             <label title="单位/物品/其他">他:<input type="number" id="limit_other" value="42"></label>
                         </div>
                     </div>
-                    <div style="border-top:1px solid var(--border-color); padding-top:5px; display:flex; flex-direction:column; gap:5px;">
+                    <div style="border-top:1px solid var(--border-color); padding-top:5px; display:flex; flex-direction:column; gap:3px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                             <span style="font-size:11px; color:var(--gold-primary); font-weight:800;">保留原文段落:</span>
+                        </div>
+                        <div style="display:flex; gap:10px;">
+                             <label title="开启后保留#descr中的硬回车(列表格式)，关闭则合并为一段"><input type="checkbox" id="opt_keep_para_descr" checked> 常规描述</label>
+                             <label title="开启后保留#msg/#text中的硬回车"><input type="checkbox" id="opt_keep_para_event" checked> 事件文本</label>
+                        </div>
+                        <div style="height:1px; background:var(--border-color); margin:2px 0;"></div>
                         <label title="即使不翻译，也对原文进行强制换行处理"><input type="checkbox" id="opt_force_reformat"> 强制重排原文</label>
                         <label title="忽略重名条目"><input type="checkbox" id="opt_ignore_dupes" style="accent-color:#ff4444"> 🚫 忽略重名条目</label>
                     </div>
@@ -366,10 +375,11 @@
     <button class="tab-btn" onclick="setFilter('misc')" data-cat="misc"><i class="fa-solid fa-layer-group"></i> 杂项</button>
 
     <div class="search-container">
-        <select class="filter-select" id="langFilter" onchange="filterData()" title="筛选语言">
+        <select class="filter-select" id="langFilter" onchange="filterData()" title="筛选状态">
             <option value="all">🌐 所有</option>
             <option value="has_cn">🇨🇳 含中</option>
             <option value="no_cn">⬜ 纯外</option>
+            <option value="dupes">⚠️ 重名</option>
         </select>
         <i class="fa-solid fa-magnifying-glass" style="color:var(--text-dim)"></i>
         <input type="text" class="search-input" id="searchInput" placeholder="搜索 ID / 原文 / 指令..." oninput="filterData()">
@@ -559,6 +569,7 @@
             let line = originalLines[i].trim();
             if (!line.startsWith('#')) continue;
 
+            // Robust split for command and ID
             const parts = line.split(/\s+/);
             const currentCmd = parts[0];
 
@@ -666,6 +677,7 @@
             const hasCN = cnRegex.test(textToCheck);
             if (langFilter === 'has_cn' && !hasCN) return -1;
             if (langFilter === 'no_cn' && hasCN) return -1;
+            if (langFilter === 'dupes' && !d.isDupe) return -1;
 
             return idx;
         }).filter(idx => idx !== -1);
@@ -761,6 +773,13 @@
 
     function copyAIPrompt() { document.getElementById('aiPromptText').select(); document.execCommand('copy'); showToast("已复制提示词！"); }
 
+    // --- Helper for wrapping logic ---
+    function wrapText(text, limit) {
+        let regex = new RegExp(`.{1,${limit}}`, 'g');
+        let parts = text.match(regex);
+        return parts ? parts.join('\n') : text;
+    }
+
     // --- Patch Generation ---
     function generatePatchMod() {
         if(!extractedData.length) return showToast("没有数据！");
@@ -769,8 +788,14 @@
         let patches = new Map();
 
         const useAutoWrap = document.getElementById('opt_auto_wrap').checked;
+        
+        // Paragraph Preservation Flags
+        const keepParaDescr = document.getElementById('opt_keep_para_descr').checked;
+        const keepParaEvent = document.getElementById('opt_keep_para_event').checked;
+
         const limitNation = parseInt(document.getElementById('limit_nation').value) || 55;
         const limitSpell = parseInt(document.getElementById('limit_spell').value) || 36;
+        const limitEvent = parseInt(document.getElementById('limit_event').value) || 35;
         const limitOther = parseInt(document.getElementById('limit_other').value) || 42;
 
         extractedData.forEach(d => {
@@ -783,19 +808,24 @@
             if (!patches.has(key)) patches.set(key, []);
 
             let finalTrans = d.trans;
-            if (d.cmdType === 'descr' && useAutoWrap) {
+            if (d.cmdType === 'descr') {
                 let limit = limitOther; 
                 if (d.type.cat === 'nation') limit = limitNation;
                 else if (d.type.cat === 'spell') limit = limitSpell;
+                else if (d.type.cat === 'event') limit = limitEvent;
 
-                let paragraphs = finalTrans.split(/\r?\n/);
-                let processed = paragraphs.map(p => {
-                    if(p.length <= limit) return p;
-                    let regex = new RegExp(`.{1,${limit}}`, 'g');
-                    let chunks = p.match(regex);
-                    return chunks ? chunks.join('\n') : p;
-                });
-                finalTrans = processed.join('\n');
+                let isEventText = ['#msg', '#text', '#killermsg'].includes(d.cmd);
+                let keepPara = isEventText ? keepParaEvent : keepParaDescr;
+
+                if (useAutoWrap) {
+                    if (keepPara) {
+                         let paragraphs = finalTrans.split(/\r?\n/);
+                         finalTrans = paragraphs.map(p => wrapText(p, limit)).join('\n');
+                    } else {
+                         let clean = finalTrans.replace(/\r?\n/g, ' '); 
+                         finalTrans = wrapText(clean, limit);
+                    }
+                }
             }
 
             patches.get(key).push(`${d.cmd} "${finalTrans}"`);
@@ -828,8 +858,13 @@
         const useGlobalSync = document.getElementById('opt_global_sync').checked;
         const forceReformat = document.getElementById('opt_force_reformat').checked;
         
+        // Preservation Flags
+        const keepParaDescr = document.getElementById('opt_keep_para_descr').checked;
+        const keepParaEvent = document.getElementById('opt_keep_para_event').checked;
+
         const limitNation = parseInt(document.getElementById('limit_nation').value) || 55;
         const limitSpell = parseInt(document.getElementById('limit_spell').value) || 36;
+        const limitEvent = parseInt(document.getElementById('limit_event').value) || 35;
         const limitOther = parseInt(document.getElementById('limit_other').value) || 42;
 
         extractedData.forEach(d => {
@@ -838,20 +873,24 @@
             if (textToUse !== null && shouldInclude(d)) {
                 let finalTrans = textToUse;
                 
+                // Smart Wrap
                 if (d.cmdType === 'descr') {
                     let limit = limitOther; 
                     if (d.type.cat === 'nation') limit = limitNation;
                     else if (d.type.cat === 'spell') limit = limitSpell;
+                    else if (d.type.cat === 'event') limit = limitEvent;
+
+                    let isEventText = ['#msg', '#text', '#killermsg'].includes(d.cmd);
+                    let keepPara = isEventText ? keepParaEvent : keepParaDescr;
 
                     if (useAutoWrap || forceReformat) {
-                        let paragraphs = finalTrans.split(/\r?\n/);
-                        let processed = paragraphs.map(p => {
-                            if(p.length <= limit) return p;
-                            let regex = new RegExp(`.{1,${limit}}`, 'g');
-                            let chunks = p.match(regex);
-                            return chunks ? chunks.join('\n') : p;
-                        });
-                        finalTrans = processed.join('\n');
+                        if (keepPara) {
+                            let paragraphs = finalTrans.split(/\r?\n/);
+                            finalTrans = paragraphs.map(p => wrapText(p, limit)).join('\n');
+                        } else {
+                            let clean = finalTrans.replace(/\r?\n/g, ' '); 
+                            finalTrans = wrapText(clean, limit);
+                        }
                     }
                 }
 
