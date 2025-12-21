@@ -258,7 +258,7 @@
 
 <header>
     <div class="header-left">
-        <h1>Dominions 6 Mod 汉化工作台 <span class="version-tag">v3.3</span></h1>
+        <h1>Dominions 6 Mod 汉化工作台 <span class="version-tag">v3.4</span></h1>
     </div>
     <div class="header-actions">
         <button class="theme-toggle" onclick="toggleTheme()" title="切换日夜模式"><i class="fa-solid fa-moon"></i></button>
@@ -322,7 +322,8 @@
                             <label title="国家Info/Brief">国:<input type="number" id="limit_nation" value="55"></label>
                             <label title="法术Descr">法:<input type="number" id="limit_spell" value="36"></label>
                             <label title="事件Msg">事:<input type="number" id="limit_event" value="35"></label>
-                            <label title="单位/物品/其他">他:<input type="number" id="limit_other" value="42"></label>
+                            <label title="物品Descr">物:<input type="number" id="limit_item" value="30"></label>
+                            <label title="单位/其他">他:<input type="number" id="limit_other" value="42"></label>
                         </div>
                     </div>
                     <div style="border-top:1px solid var(--border-color); padding-top:5px; display:flex; flex-direction:column; gap:3px;">
@@ -337,7 +338,7 @@
                         <label title="即使不翻译，也对原文进行强制换行处理"><input type="checkbox" id="opt_force_reformat"> 强制重排原文</label>
                         <div style="display:flex; gap:15px;">
                             <label title="忽略重名条目"><input type="checkbox" id="opt_ignore_dupes" style="accent-color:#ff4444"> 🚫 忽略重名条目</label>
-                            <label title="忽略原文中包含[]的条目（如[Basic Imperial Harmony]），不显示也不导出"><input type="checkbox" id="opt_ignore_brackets"> 🚫 忽略含 [ ] 的文本</label>
+                            <label title="忽略原文中包含[]的条目"><input type="checkbox" id="opt_ignore_brackets"> 🚫 忽略含 [ ]</label>
                         </div>
                     </div>
                 </div>
@@ -802,6 +803,7 @@
         const limitNation = parseInt(document.getElementById('limit_nation').value) || 55;
         const limitSpell = parseInt(document.getElementById('limit_spell').value) || 36;
         const limitEvent = parseInt(document.getElementById('limit_event').value) || 35;
+        const limitItem = parseInt(document.getElementById('limit_item').value) || 30; // New
         const limitOther = parseInt(document.getElementById('limit_other').value) || 42;
 
         extractedData.forEach(d => {
@@ -819,6 +821,7 @@
                 if (d.type.cat === 'nation') limit = limitNation;
                 else if (d.type.cat === 'spell') limit = limitSpell;
                 else if (d.type.cat === 'event') limit = limitEvent;
+                else if (d.type.cat === 'item') limit = limitItem; // New
 
                 let isEventText = ['#msg', '#text', '#killermsg'].includes(d.cmd);
                 let keepPara = isEventText ? keepParaEvent : keepParaDescr;
@@ -871,6 +874,7 @@
         const limitNation = parseInt(document.getElementById('limit_nation').value) || 55;
         const limitSpell = parseInt(document.getElementById('limit_spell').value) || 36;
         const limitEvent = parseInt(document.getElementById('limit_event').value) || 35;
+        const limitItem = parseInt(document.getElementById('limit_item').value) || 30; // New
         const limitOther = parseInt(document.getElementById('limit_other').value) || 42;
 
         extractedData.forEach(d => {
@@ -885,6 +889,7 @@
                     if (d.type.cat === 'nation') limit = limitNation;
                     else if (d.type.cat === 'spell') limit = limitSpell;
                     else if (d.type.cat === 'event') limit = limitEvent;
+                    else if (d.type.cat === 'item') limit = limitItem; // New
 
                     let isEventText = ['#msg', '#text', '#killermsg'].includes(d.cmd);
                     let keepPara = isEventText ? keepParaEvent : keepParaDescr;
