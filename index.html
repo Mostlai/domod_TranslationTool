@@ -2,7 +2,7 @@
 <html lang="zh-CN" data-theme="dark">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Dominions 6 Mod 汉化工作台</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -45,28 +45,15 @@
             --tag-event: #2e7d32; --tag-nation: #1565c0; --tag-misc: #455a64;
         }
 
-        /* Scrollbar Styling */
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: var(--bg-color); }
-        ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--gold-dim); }
-
         body {
             background-color: var(--bg-color);
             background-image: radial-gradient(circle at 50% 0%, var(--gold-glow) 0%, transparent 70%);
             color: var(--text-main);
             font-family: "Segoe UI", "Inter", sans-serif;
-            margin: 0; 
-            padding: 15px;
-            /* Safe area for mobile notches */
-            padding-left: max(15px, env(safe-area-inset-left));
-            padding-right: max(15px, env(safe-area-inset-right));
-            padding-bottom: max(15px, env(safe-area-inset-bottom));
-            
+            margin: 0; padding: 10px;
             display: flex; flex-direction: column;
-            height: 100vh; /* Full viewport height */
-            height: 100dvh; /* Dynamic viewport height for mobile browsers */
-            overflow: hidden; /* Prevent body scroll */
+            height: 100vh; 
+            overflow: hidden; 
             transition: background 0.3s, color 0.3s;
             box-sizing: border-box;
         }
@@ -74,79 +61,74 @@
         /* --- Header --- */
         header {
             display: flex; justify-content: space-between; align-items: center;
-            padding-bottom: 10px; margin-bottom: 10px;
+            padding-bottom: 8px; margin-bottom: 8px;
             border-bottom: 1px solid var(--border-color);
             flex-shrink: 0;
-            flex-wrap: wrap; /* Allow wrap on very small screens */
-            gap: 10px;
         }
         .header-left h1 {
             color: var(--gold-primary); margin: 0;
             font-family: "Palatino Linotype", serif; letter-spacing: 1px;
             text-shadow: 0 2px 10px var(--gold-glow);
-            font-size: clamp(16px, 4vw, 20px); /* Responsive font size */
-            white-space: nowrap;
+            font-size: 18px;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
         .version-tag { 
             font-size: 11px; background: var(--gold-glow); color: var(--gold-primary); 
             padding: 2px 8px; border-radius: 12px; font-weight: bold; border: 1px solid var(--gold-primary);
-            margin-left: 10px; vertical-align: middle;
+            margin-left: 5px; vertical-align: middle; display: inline-block;
         }
         .header-actions { display: flex; gap: 10px; align-items: center; }
-        .theme-toggle { background:none; border:none; cursor:pointer; font-size:18px; color:var(--text-dim); transition:0.3s; padding: 5px;}
+        .theme-toggle { background:none; border:none; cursor:pointer; font-size:16px; color:var(--text-dim); transition:0.3s; padding: 5px; }
         .theme-toggle:hover { color:var(--gold-primary); transform: rotate(15deg); }
         .github-link {
             text-decoration: none; color: var(--text-dim); background: var(--panel-bg);
-            border: 1px solid var(--border-color); padding: 5px 12px; border-radius: 20px;
-            font-size: 12px; display: flex; align-items: center; gap: 6px; box-shadow: var(--shadow-soft);
-            transition: 0.3s;
+            border: 1px solid var(--border-color); padding: 4px 10px; border-radius: 20px;
+            font-size: 12px; display: flex; align-items: center; gap: 5px; box-shadow: var(--shadow-soft);
+            transition: 0.3s; white-space: nowrap;
         }
         .github-link:hover { color: var(--gold-primary); border-color: var(--gold-primary); transform: translateY(-2px); }
 
-        /* --- Control Panel (Responsive Grid) --- */
+        /* --- Control Panel (Advanced Responsive) --- */
         .control-panel {
             background: var(--panel-bg); border: 1px solid var(--border-color);
-            border-radius: 12px; padding: 12px; margin-bottom: 10px;
+            border-radius: 12px; padding: 12px; margin-bottom: 8px;
             box-shadow: var(--shadow-soft); backdrop-filter: blur(5px);
             
             display: grid; 
-            gap: 15px;
-            /* Intelligent grid that fits based on available space */
-            grid-template-columns: minmax(200px, 220px) 1fr minmax(140px, 160px);
+            gap: 12px;
+            /* Desktop Default */
+            grid-template-columns: 200px 1fr 160px;
             grid-template-areas: "file config actions";
             
             flex-shrink: 0; 
             transition: all 0.3s ease;
-            max-height: 40vh; /* Prevent it from taking over the whole screen on short devices */
-            overflow-y: auto; /* Allow internal scrolling if content overflows vertically */
+            max-height: 40vh; /* Prevent taking up too much screen on weird laptops */
+            overflow-y: auto;
         }
 
-        .col-file { grid-area: file; display: flex; flex-direction: column; gap: 10px; }
-        .col-config { grid-area: config; display: flex; flex-direction: column; gap: 5px; min-width: 0; /* Prevent flex blowout */ }
-        .col-actions { grid-area: actions; display: flex; flex-direction: column; gap: 8px; justify-content: start; }
+        .col-file { grid-area: file; display: flex; flex-direction: column; gap: 8px; }
+        .col-config { grid-area: config; display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+        .col-actions { grid-area: actions; display: flex; flex-direction: column; gap: 6px; justify-content: flex-start; }
 
         .col-title { 
-            color: var(--gold-primary); font-size: 12px; font-weight: 700; margin-bottom: 5px; 
+            color: var(--gold-primary); font-size: 11px; font-weight: 700; margin-bottom: 4px; 
             display: block; text-transform: uppercase; letter-spacing: 0.5px; 
             border-bottom: 2px solid var(--border-color); padding-bottom: 2px;
-            white-space: nowrap;
         }
 
         /* --- Components --- */
         select, input[type="text"], input[type="number"] { 
             background: var(--input-bg); color: var(--text-main); border: 1px solid var(--border-color); 
-            border-radius: 6px; outline: none; transition: 0.2s;
-            height: 30px; /* Fixed height for consistency */
+            border-radius: 6px; outline: none; transition: 0.2s; max-width: 100%;
         }
-        select { padding: 0 6px; width: 100%; cursor: pointer; font-size: 12px;}
+        select { padding: 6px; width: 100%; cursor: pointer; font-size: 12px;}
         select:hover { border-color: var(--gold-dim); }
 
         .btn {
             background: var(--input-bg); color: var(--text-main); border: 1px solid var(--border-color);
-            padding: 0 12px; height: 32px; /* Touch friendly */
-            cursor: pointer; font-weight: 600; font-size: 12px;
+            padding: 8px 10px; cursor: pointer; font-weight: 600; font-size: 12px;
             border-radius: 6px; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 6px;
-            white-space: nowrap;
+            white-space: nowrap; flex: 1;
         }
         .btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-hover); border-color: var(--gold-primary); }
         .btn-primary { background: linear-gradient(135deg, #a01a1a, #680e0e); color: white; border: none; }
@@ -157,61 +139,53 @@
         .btn-teal { background: linear-gradient(135deg, #00838f, #006064); color: white; border: none; }
         .btn-patch { background: linear-gradient(135deg, #424242, #212121); border: 1px solid var(--gold-dim); color: var(--gold-primary); }
 
-        /* Config Grid - Responsive */
+        /* Config Grid */
         .config-grid {
-            display: grid; 
-            /* Auto-fit magic: fitting as many as possible with min-width */
-            grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); 
-            gap: 8px;
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px;
             background: var(--input-bg); padding: 8px; border-radius: 8px; border: 1px solid var(--border-color);
         }
         .config-group { display: flex; flex-direction: column; gap: 2px; }
-        .head { font-size: 11px; font-weight: bold; color: var(--text-dim); border-bottom: 1px solid var(--border-color); margin-bottom: 2px; display: flex; align-items: center; gap: 4px; white-space: nowrap;}
+        .head { font-size: 11px; font-weight: bold; color: var(--text-dim); border-bottom: 1px solid var(--border-color); margin-bottom: 2px; display: flex; align-items: center; gap: 4px; white-space: nowrap; }
         .head i { width: 14px; text-align: center; color: var(--gold-primary); font-size: 10px;}
         
-        label { font-size: 11px; display: flex; align-items: center; gap: 4px; cursor: pointer; color: var(--text-dim); white-space: nowrap; user-select: none;}
+        label { font-size: 11px; display: flex; align-items: center; gap: 4px; cursor: pointer; color: var(--text-dim); white-space: nowrap; }
         label:hover { color: var(--text-main); }
-        input[type="checkbox"], input[type="radio"] { accent-color: var(--gold-primary); cursor: pointer; width: 14px; height: 14px; margin: 0;}
+        input[type="checkbox"], input[type="radio"] { accent-color: var(--gold-primary); cursor: pointer; width: 12px; height: 12px; flex-shrink: 0;}
 
         /* Advanced Options */
         .advanced-options {
             border-top: 1px dashed var(--border-color); margin-top: 5px; padding-top: 8px;
-            display: flex; gap: 10px; 
-            overflow-x: auto; /* Scroll horizontally on small screens */
-            padding-bottom: 5px; /* Space for scrollbar */
+            display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px;
         }
         .adv-block {
             display: flex; flex-direction: column; gap: 4px; flex: 1;
-            background: var(--panel-bg); padding: 8px; border-radius: 6px; border: 1px solid var(--border-color);
-            min-width: 240px; 
+            background: var(--panel-bg); padding: 6px; border-radius: 6px; border: 1px solid var(--border-color);
+            min-width: 220px;
         }
-        .adv-title { font-size: 11px; color: var(--gold-primary); font-weight: 800; text-transform: uppercase; border-bottom: 1px solid var(--border-color); padding-bottom: 2px; margin-bottom: 2px; }
-        .sync-matrix { display: flex; flex-wrap: wrap; gap: 5px; }
+        .adv-title { font-size: 10px; color: var(--gold-primary); font-weight: 800; text-transform: uppercase; border-bottom: 1px solid var(--border-color); padding-bottom: 2px; margin-bottom: 2px; }
+        .sync-matrix { display: flex; flex-wrap: wrap; gap: 4px; }
         .sync-item { 
-            display: flex; align-items: center; gap: 3px; font-size: 10px; 
-            background: var(--input-bg); padding: 4px 6px; border-radius: 4px; border: 1px solid var(--border-color);
-            color: var(--text-dim); flex-grow: 1; justify-content: center;
+            display: flex; align-items: center; gap: 2px; font-size: 10px; 
+            background: var(--input-bg); padding: 2px 5px; border-radius: 4px; border: 1px solid var(--border-color);
+            color: var(--text-dim);
         }
-        input[type="number"] { width: 40px; padding: 1px; text-align: center; font-size: 11px; font-weight: bold; background: var(--input-bg); border: 1px solid var(--border-color); color:var(--gold-primary); border-radius:3px; }
+        input[type="number"] { width: 35px; padding: 1px; text-align: center; font-size: 11px; font-weight: bold; background: var(--input-bg); border: 1px solid var(--border-color); color:var(--gold-primary); border-radius:3px; }
 
         /* Filter Bar */
-        .filter-bar { 
-            display: flex; gap: 4px; padding: 0 5px; align-items: flex-end; flex-shrink: 0; 
-            overflow-x: auto; /* Scrollable tabs */
-            -webkit-overflow-scrolling: touch;
-            padding-bottom: 2px;
-        }
+        .filter-bar { display: flex; gap: 4px; padding: 0 5px; align-items: flex-end; flex-shrink: 0; overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 0; margin-bottom: 0; }
+        .filter-bar::-webkit-scrollbar { height: 4px; }
+        .filter-bar::-webkit-scrollbar-thumb { background: var(--gold-dim); border-radius: 2px; }
+
         .tab-btn {
             background: var(--input-bg); border: 1px solid var(--border-color); border-bottom: none;
-            color: var(--text-dim); padding: 8px 12px; cursor: pointer; font-size: 11px; font-weight: bold;
+            color: var(--text-dim); padding: 6px 12px; cursor: pointer; font-size: 11px; font-weight: bold;
             border-radius: 6px 6px 0 0; transition: 0.2s; display: flex; align-items: center; gap: 5px; white-space: nowrap;
-            flex-shrink: 0; /* Don't shrink tabs */
         }
         .tab-btn:hover { background: var(--panel-bg); color: var(--text-main); }
         .tab-btn.active { 
             background: var(--panel-bg); color: var(--gold-primary); 
             border-top: 3px solid var(--gold-primary); border-bottom: 1px solid var(--panel-bg); 
-            z-index: 5; padding-bottom: 10px; margin-top: -2px;
+            z-index: 5; padding-bottom: 8px; margin-top: -2px;
         }
         /* Active borders */
         .tab-btn[data-cat="unit"].active { border-top-color: var(--tag-unit); color: var(--tag-unit); }
@@ -223,51 +197,42 @@
         .tab-btn[data-cat="misc"].active { border-top-color: var(--tag-misc); color: var(--tag-misc); }
 
         .search-container {
-            margin-left: auto; display: flex; align-items: center; gap: 8px; 
-            background: var(--input-bg); padding: 4px 10px; height: 30px;
+            margin-left: auto; display: flex; align-items: center; gap: 6px; 
+            background: var(--input-bg); padding: 4px 10px; 
             border-radius: 12px 12px 0 0; border: 1px solid var(--border-color); border-bottom: none;
-            flex-shrink: 0;
-            position: sticky; right: 0; z-index: 10;
+            flex-wrap: nowrap;
         }
-        .search-input { width: 120px; font-size: 12px; border:none; background:transparent;}
-        .search-input:focus { width: 150px; outline:none;}
-        .filter-select { background: transparent; border: none; color: var(--text-dim); font-size: 11px; outline: none; cursor: pointer; border-right: 1px solid var(--border-color); padding-right: 8px; margin-right: 5px; width: auto;}
+        .search-input { width: 100px; font-size: 12px; border:none; background:transparent; }
+        .search-input:focus { width: 140px; outline:none; }
+        .filter-select { background: transparent; border: none; color: var(--text-dim); font-size: 11px; outline: none; cursor: pointer; border-right: 1px solid var(--border-color); padding-right: 6px; margin-right: 4px; width: auto; }
         .filter-select option { background: var(--input-bg); color: var(--text-main); }
-        .counter { font-size: 10px; color: var(--text-dim); white-space: nowrap;}
+        .counter { font-size: 10px; color: var(--text-dim); white-space: nowrap; }
 
-        /* --- Table Area (The Flexible Part) --- */
+        /* --- Table Area --- */
         .table-wrap { 
-            flex: 1; 
+            flex: 1; /* Key for filling space */
             min-height: 0; 
-            overflow: auto; /* Both X and Y scrolling */
+            overflow-y: auto; 
             border: 1px solid var(--border-color); 
             background: var(--panel-bg); 
             box-shadow: var(--shadow-soft);
             display: flex; flex-direction: column;
-            overscroll-behavior: contain; /* Prevent parent scroll chaining */
+            position: relative;
         }
         table { width: 100%; border-collapse: collapse; font-size: 13px; table-layout: fixed; }
-        
-        /* Fixed Column Widths for better mobile view */
-        th:nth-child(1) { width: 60px; min-width: 60px; }
-        th:nth-child(2) { width: 90px; min-width: 90px; }
-        th:nth-child(3) { width: 40%; min-width: 250px; } /* Original text needs space */
-        th:nth-child(4) { min-width: 250px; } /* Trans text needs space */
-
         th { 
-            background: var(--input-bg); color: var(--gold-primary); padding: 10px; 
+            background: var(--input-bg); color: var(--gold-primary); padding: 8px; 
             position: sticky; top: 0; z-index: 10; border-bottom: 2px solid var(--border-color); text-align: left;
-            font-size: 11px; white-space: nowrap;
+            font-size: 11px;
         }
-        td { padding: 8px 10px; border-bottom: 1px solid var(--border-color); vertical-align: top; color: var(--text-main); line-height: 1.4; word-wrap: break-word; }
+        td { padding: 6px 8px; border-bottom: 1px solid var(--border-color); vertical-align: top; color: var(--text-main); line-height: 1.4; word-wrap: break-word; }
         tr:nth-child(even) { background: rgba(128,128,128,0.02); }
         tr:hover { background: var(--gold-glow); }
 
         textarea {
-            width: 98%; background: var(--input-bg); color: var(--text-main);
-            border: 1px solid var(--border-color); border-radius: 4px; padding: 6px;
-            resize: vertical; font-family: inherit; line-height: 1.4; min-height: 32px; overflow: hidden; font-size: 13px;
-            box-sizing: border-box;
+            width: 96%; background: var(--input-bg); color: var(--text-main);
+            border: 1px solid var(--border-color); border-radius: 4px; padding: 4px;
+            resize: none; font-family: inherit; line-height: 1.4; min-height: 24px; overflow: hidden; font-size: 13px;
         }
         textarea:focus { border-color: var(--gold-primary); background: var(--panel-bg); box-shadow: 0 0 0 2px var(--gold-glow); outline: none; }
 
@@ -281,21 +246,21 @@
 
         .pagination-bar {
             display: flex; justify-content: space-between; align-items: center;
-            background: var(--input-bg); padding: 8px 15px; border: 1px solid var(--border-color); border-top: none;
+            background: var(--input-bg); padding: 5px 15px; border: 1px solid var(--border-color); border-top: none;
             border-radius: 0 0 8px 8px; flex-shrink: 0;
             font-size: 11px;
         }
-        .page-btn { padding: 5px 15px; cursor: pointer; background: var(--panel-bg); border: 1px solid var(--border-color); color: var(--text-main); border-radius: 4px; }
+        .page-btn {
+            background: var(--panel-bg); border: 1px solid var(--border-color); color: var(--text-main);
+            padding: 4px 10px; border-radius: 4px; cursor: pointer;
+        }
         .page-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
         /* Modals */
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 100; justify-content: center; align-items: center; backdrop-filter: blur(5px); padding: 20px; }
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 100; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
         .modal.active { display: flex; animation: zoomIn 0.2s ease; }
         .modal-box { 
-            background: var(--panel-bg); border: 1px solid var(--gold-dim); padding: 20px; 
-            width: 100%; max-width: 750px; 
-            max-height: calc(100vh - 40px); /* Fit within viewport */
-            overflow-y: auto; /* Allow internal scrolling */
+            background: var(--panel-bg); border: 1px solid var(--gold-dim); padding: 20px; width: 90%; max-width: 750px; max-height: 90vh; overflow-y: auto;
             box-shadow: 0 20px 60px rgba(0,0,0,0.6); border-radius: 10px; display: flex; flex-direction: column; gap: 15px;
         }
         .scope-options { display: flex; gap: 20px; background: var(--input-bg); padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 12px; flex-wrap: wrap;}
@@ -307,64 +272,70 @@
             background: var(--panel-bg); border-left: 4px solid var(--gold-primary); color: var(--text-main);
             padding: 8px 20px; opacity: 0; transition: 0.3s; z-index: 200; font-size: 12px;
             border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); font-weight: bold;
-            display: flex; align-items: center; gap: 10px; width: max-content; max-width: 90%;
+            display: flex; align-items: center; gap: 10px; white-space: nowrap;
         }
         #toast.show { opacity: 1; bottom: 60px; }
         
-        .glossary-group { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+        .glossary-group { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
 
         /* --- RESPONSIVE MEDIA QUERIES --- */
-
-        /* Laptop / Tablet Mode (< 1024px) */
-        @media (max-width: 1024px) {
+        
+        /* 1. Tablet & Laptop (< 1100px) */
+        @media (max-width: 1100px) {
             .control-panel {
                 grid-template-columns: 1fr 1fr;
                 grid-template-areas: 
                     "file actions"
                     "config config";
             }
-            .col-file { flex-direction: row; flex-wrap: wrap; align-items: flex-end; }
-            .col-file > * { flex: 1; min-width: 120px; }
-            .col-actions { flex-direction: row; flex-wrap: wrap; align-items: flex-end; }
-            .col-actions > * { flex: 1; min-width: 100px; }
-            .glossary-group { flex: 1; min-width: 140px; }
+            .config-grid { grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); }
+            .col-file { flex-direction: row; align-items: flex-end; }
+            .col-file > * { flex: 1; }
+            .col-actions { flex-direction: row; flex-wrap: wrap; }
+            .col-actions > * { flex: 1; min-width: 120px; }
+            .glossary-group { min-width: 200px; }
         }
 
-        /* Mobile / Portrait Tablet (< 768px) */
-        @media (max-width: 768px) {
+        /* 2. Mobile & Small Screens (< 700px) */
+        @media (max-width: 700px) {
             body { padding: 5px; }
-            .control-panel {
-                display: flex; flex-direction: column;
-                gap: 10px; padding: 10px;
-                max-height: 35vh;
-            }
-            .col-file, .col-actions { flex-direction: row; flex-wrap: wrap; }
-            .col-file .btn, .col-actions .btn { flex-grow: 1; }
-            
+            header { flex-wrap: wrap; gap: 5px; }
+            .header-left h1 { font-size: 16px; }
             .header-actions { margin-left: auto; }
-            .header-left h1 { font-size: 18px; }
-
-            .filter-bar { padding-bottom: 0; }
-            .search-container { width: auto; flex-grow: 1; justify-content: flex-end;}
-            .search-input:focus { width: 100px; }
             
-            /* Prevent input zoom on iOS */
-            select, input, textarea { font-size: 16px !important; }
-            .btn { height: 36px; } /* Larger touch targets */
+            .control-panel {
+                display: flex; flex-direction: column; gap: 10px; padding: 10px;
+                max-height: 35vh; /* Allow more scrolling for panel on mobile */
+            }
+            .col-file { flex-direction: column; }
+            .col-actions { flex-direction: column; }
+            .col-actions > div { display: flex; gap: 5px; }
             
-            /* Hide advanced options in mobile to save space unless scrolled */
-            .advanced-options { flex-direction: column; min-width: 0; }
-            .adv-block { min-width: 0; }
+            .config-grid { grid-template-columns: repeat(2, 1fr); }
+            
+            /* Table optimization for mobile */
+            th:nth-child(1), td:nth-child(1) { display: none; } /* Hide ID */
+            th:nth-child(2) { width: 40px; font-size: 9px; overflow: hidden; } /* Shrink Command Header */
+            td:nth-child(2) { font-size: 9px; white-space: pre-wrap; word-break: break-all; } /* Shrink Command Body */
+            
+            /* Filter Bar adjustments */
+            .filter-bar { padding-bottom: 5px; }
+            .search-container { 
+                margin-left: 0; width: 100%; border-radius: 8px; border-bottom: 1px solid var(--border-color);
+                margin-top: 5px; flex: 1 0 100%; order: 10;
+            }
+            .filter-bar { flex-wrap: wrap; }
+            .tab-btn { flex: 1; justify-content: center; padding: 6px 4px; font-size: 10px; }
+            .tab-btn i { display: none; } /* Hide icons in tabs to save space */
+            
+            #toast { width: 80%; justify-content: center; }
         }
 
-        /* Short Screens (Landscape Phones / Weird Laptops) */
+        /* 3. Short Vertical Screens (Weird Laptops) */
         @media (max-height: 600px) {
-            header { margin-bottom: 5px; padding-bottom: 5px; }
-            .control-panel { max-height: 150px; padding: 5px; margin-bottom: 5px; gap: 5px;}
-            .col-title { font-size: 10px; margin-bottom: 2px; }
-            .config-grid { padding: 2px; gap: 2px; }
-            .btn { height: 24px; font-size: 11px; }
-            textarea { min-height: 24px; }
+            header { margin-bottom: 4px; padding-bottom: 4px; }
+            .control-panel { max-height: 150px; }
+            .btn { padding: 4px 8px; }
         }
     </style>
 </head>
@@ -372,7 +343,7 @@
 
 <header>
     <div class="header-left">
-        <h1>Dom6 汉化台 <span class="version-tag">v3.5</span></h1>
+        <h1>Dom6 汉化台 <span class="version-tag">v3.6</span></h1>
     </div>
     <div class="header-actions">
         <button class="theme-toggle" onclick="toggleTheme()" title="切换日夜模式"><i class="fa-solid fa-moon"></i></button>
@@ -395,7 +366,7 @@
     </div>
 
     <!-- 2. Config -->
-    <div class="col-config" style="grid-column: span 1;">
+    <div class="col-config">
         <span class="col-title"><i class="fa-solid fa-sliders"></i> 配置</span>
         <div class="config-grid">
             <div class="config-group"><div class="head"><i class="fa-solid fa-hat-wizard"></i> 法术</div><label><input type="checkbox" id="cfg_spell_name"> Name</label><label><input type="checkbox" id="cfg_spell_descr" checked> Descr</label></div>
@@ -438,11 +409,11 @@
                         <label title="单位/其他">他:<input type="number" id="limit_other" value="42"></label>
                     </div>
                     <div style="border-top:1px solid var(--border-color); padding-top:4px; display:flex; flex-direction:column; gap:2px;">
-                        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                        <div style="display:flex; gap:10px;">
                              <label title="保留#descr中的硬回车"><input type="checkbox" id="opt_keep_para_descr" checked> 保留段落(常)</label>
                              <label title="保留#msg/#text中的硬回车"><input type="checkbox" id="opt_keep_para_event" checked> 保留段落(事)</label>
                         </div>
-                        <div style="display:flex; gap:10px; margin-top:2px; flex-wrap:wrap;">
+                        <div style="display:flex; gap:10px; margin-top:2px;">
                             <label title="强制重排"><input type="checkbox" id="opt_force_reformat"> 强制重排</label>
                             <label title="忽略重名条目"><input type="checkbox" id="opt_ignore_dupes" style="accent-color:#ff4444"> 🚫 忽略重名</label>
                             <label title="忽略[]内容"><input type="checkbox" id="opt_ignore_brackets"> 🚫 忽略[]</label>
@@ -456,8 +427,10 @@
     <!-- 3. Actions -->
     <div class="col-actions">
         <span class="col-title" style="text-align:center"><i class="fa-solid fa-bolt"></i> 操作</span>
-        <button class="btn btn-purple" onclick="openAIPromptModal()"><i class="fa-solid fa-brain"></i> AI 提示词</button>
-        <button class="btn btn-success" onclick="document.getElementById('importModal').classList.add('active')"><i class="fa-solid fa-file-import"></i> 导入翻译</button>
+        <div style="display:flex; gap:5px; width:100%;">
+            <button class="btn btn-purple" onclick="openAIPromptModal()"><i class="fa-solid fa-brain"></i> AI</button>
+            <button class="btn btn-success" onclick="document.getElementById('importModal').classList.add('active')"><i class="fa-solid fa-file-import"></i> 导入</button>
+        </div>
         
         <div class="glossary-group">
             <button class="btn btn-teal" onclick="exportGlossary()"><i class="fa-solid fa-file-export"></i> 导词库</button>
@@ -465,7 +438,7 @@
             <button class="btn btn-teal" onclick="document.getElementById('glossaryInput').click()"><i class="fa-solid fa-book"></i> 导词库</button>
         </div>
 
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px;">
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px; width:100%;">
             <button class="btn btn-fix" onclick="autoFixSwappedNames()"><i class="fa-solid fa-wand-magic-sparkles"></i> 修复</button>
             <button class="btn btn-patch" onclick="generatePatchMod()" title="生成补丁Mod"><i class="fa-solid fa-bandage"></i> 补丁</button>
         </div>
@@ -501,9 +474,9 @@
     <table id="dataTable">
         <thead>
             <tr>
-                <th>ID</th>
-                <th>指令</th>
-                <th>原文</th>
+                <th width="60">ID</th>
+                <th width="80">指令</th>
+                <th width="40%">原文</th>
                 <th>译文</th>
             </tr>
         </thead>
@@ -530,8 +503,8 @@
             <label><input type="radio" name="aiScope" value="all" checked onchange="regenerateAIPrompt()"> 所有未翻</label>
             <label><input type="radio" name="aiScope" value="filtered" onchange="regenerateAIPrompt()"> 仅当前</label>
         </div>
-        <textarea id="aiPromptText" style="height:300px; color:var(--text-main); border-color:var(--gold-dim); flex-grow: 1;" readonly></textarea>
-        <div style="text-align:right; display:flex; justify-content:flex-end; gap:10px; margin-top: auto;">
+        <textarea id="aiPromptText" style="height:300px; color:var(--text-main); border-color:var(--gold-dim);" readonly></textarea>
+        <div style="text-align:right; display:flex; justify-content:flex-end; gap:10px;">
             <button class="btn btn-purple" onclick="copyAIPrompt()"><i class="fa-regular fa-copy"></i> 复制</button>
             <button class="btn" onclick="document.getElementById('aiPromptModal').classList.remove('active')">关闭</button>
         </div>
@@ -541,8 +514,8 @@
 <div id="importModal" class="modal">
     <div class="modal-box">
         <h3 style="color:var(--gold-primary);"><i class="fa-solid fa-paste"></i> 导入翻译</h3>
-        <textarea id="pasteArea" style="height:350px; flex-grow: 1;" placeholder="粘贴 AI 内容..."></textarea>
-        <div style="text-align:right; display:flex; justify-content:flex-end; gap:10px; margin-top: auto;">
+        <textarea id="pasteArea" style="height:350px;" placeholder="粘贴 AI 内容..."></textarea>
+        <div style="text-align:right; display:flex; justify-content:flex-end; gap:10px;">
             <button class="btn btn-primary" onclick="processImport()"><i class="fa-solid fa-check"></i> 确认</button>
             <button class="btn" onclick="document.getElementById('importModal').classList.remove('active')">关闭</button>
         </div>
