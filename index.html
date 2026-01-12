@@ -2,7 +2,7 @@
 <html lang="zh-CN" data-theme="dark">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Dominions 6 Mod 汉化工作台</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -45,120 +45,110 @@
             --tag-event: #2e7d32; --tag-nation: #1565c0; --tag-misc: #455a64;
         }
 
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-color); }
+        ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--gold-dim); }
+
         body {
             background-color: var(--bg-color);
             background-image: radial-gradient(circle at 50% 0%, var(--gold-glow) 0%, transparent 70%);
             color: var(--text-main);
             font-family: "Segoe UI", "Inter", sans-serif;
-            margin: 0; padding: 20px;
+            margin: 0; 
+            padding: 15px;
+            /* Safe area for mobile notches */
+            padding-left: max(15px, env(safe-area-inset-left));
+            padding-right: max(15px, env(safe-area-inset-right));
+            padding-bottom: max(15px, env(safe-area-inset-bottom));
+            
             display: flex; flex-direction: column;
-            height: 98vh;
-            overflow: hidden;
+            height: 100vh; /* Full viewport height */
+            height: 100dvh; /* Dynamic viewport height for mobile browsers */
+            overflow: hidden; /* Prevent body scroll */
             transition: background 0.3s, color 0.3s;
+            box-sizing: border-box;
         }
 
         /* --- Header --- */
         header {
             display: flex; justify-content: space-between; align-items: center;
-            padding-bottom: 15px; margin-bottom: 20px;
+            padding-bottom: 10px; margin-bottom: 10px;
             border-bottom: 1px solid var(--border-color);
+            flex-shrink: 0;
+            flex-wrap: wrap; /* Allow wrap on very small screens */
+            gap: 10px;
         }
         .header-left h1 {
             color: var(--gold-primary); margin: 0;
             font-family: "Palatino Linotype", serif; letter-spacing: 1px;
             text-shadow: 0 2px 10px var(--gold-glow);
+            font-size: clamp(16px, 4vw, 20px); /* Responsive font size */
+            white-space: nowrap;
         }
         .version-tag { 
             font-size: 11px; background: var(--gold-glow); color: var(--gold-primary); 
             padding: 2px 8px; border-radius: 12px; font-weight: bold; border: 1px solid var(--gold-primary);
             margin-left: 10px; vertical-align: middle;
         }
-        .header-actions { display: flex; gap: 15px; align-items: center; }
-        .theme-toggle { background:none; border:none; cursor:pointer; font-size:18px; color:var(--text-dim); transition:0.3s; }
+        .header-actions { display: flex; gap: 10px; align-items: center; }
+        .theme-toggle { background:none; border:none; cursor:pointer; font-size:18px; color:var(--text-dim); transition:0.3s; padding: 5px;}
         .theme-toggle:hover { color:var(--gold-primary); transform: rotate(15deg); }
         .github-link {
             text-decoration: none; color: var(--text-dim); background: var(--panel-bg);
-            border: 1px solid var(--border-color); padding: 6px 14px; border-radius: 20px;
-            font-size: 13px; display: flex; align-items: center; gap: 6px; box-shadow: var(--shadow-soft);
+            border: 1px solid var(--border-color); padding: 5px 12px; border-radius: 20px;
+            font-size: 12px; display: flex; align-items: center; gap: 6px; box-shadow: var(--shadow-soft);
             transition: 0.3s;
         }
         .github-link:hover { color: var(--gold-primary); border-color: var(--gold-primary); transform: translateY(-2px); }
 
-        /* --- Control Panel --- */
+        /* --- Control Panel (Responsive Grid) --- */
         .control-panel {
             background: var(--panel-bg); border: 1px solid var(--border-color);
-            border-radius: 12px; padding: 20px; margin-bottom: 15px;
-            display: grid; grid-template-columns: 220px 1fr 160px; gap: 25px;
+            border-radius: 12px; padding: 12px; margin-bottom: 10px;
             box-shadow: var(--shadow-soft); backdrop-filter: blur(5px);
+            
+            display: grid; 
+            gap: 15px;
+            /* Intelligent grid that fits based on available space */
+            grid-template-columns: minmax(200px, 220px) 1fr minmax(140px, 160px);
+            grid-template-areas: "file config actions";
+            
+            flex-shrink: 0; 
+            transition: all 0.3s ease;
+            max-height: 40vh; /* Prevent it from taking over the whole screen on short devices */
+            overflow-y: auto; /* Allow internal scrolling if content overflows vertically */
         }
+
+        .col-file { grid-area: file; display: flex; flex-direction: column; gap: 10px; }
+        .col-config { grid-area: config; display: flex; flex-direction: column; gap: 5px; min-width: 0; /* Prevent flex blowout */ }
+        .col-actions { grid-area: actions; display: flex; flex-direction: column; gap: 8px; justify-content: start; }
+
         .col-title { 
-            color: var(--gold-primary); font-size: 13px; font-weight: 700; margin-bottom: 10px; 
+            color: var(--gold-primary); font-size: 12px; font-weight: 700; margin-bottom: 5px; 
             display: block; text-transform: uppercase; letter-spacing: 0.5px; 
-            border-bottom: 2px solid var(--border-color); padding-bottom: 5px;
+            border-bottom: 2px solid var(--border-color); padding-bottom: 2px;
+            white-space: nowrap;
         }
 
-        /* File & Select */
-        .col-file { display: flex; flex-direction: column; gap: 12px; }
-        select { 
+        /* --- Components --- */
+        select, input[type="text"], input[type="number"] { 
             background: var(--input-bg); color: var(--text-main); border: 1px solid var(--border-color); 
-            padding: 8px; border-radius: 6px; width: 100%; outline: none; cursor: pointer;
+            border-radius: 6px; outline: none; transition: 0.2s;
+            height: 30px; /* Fixed height for consistency */
         }
-        
-        /* Config Grid */
-        .config-grid {
-            display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;
-            background: var(--input-bg); padding: 12px; border-radius: 8px; border: 1px solid var(--border-color);
-        }
-        .config-group { display: flex; flex-direction: column; gap: 4px; }
-        .head { 
-            font-size: 11px; font-weight: bold; color: var(--text-dim); 
-            border-bottom: 1px solid var(--border-color); padding-bottom: 2px; margin-bottom: 2px; 
-            display: flex; align-items: center; gap: 6px;
-        }
-        .head i { width: 14px; text-align: center; color: var(--gold-primary); }
+        select { padding: 0 6px; width: 100%; cursor: pointer; font-size: 12px;}
+        select:hover { border-color: var(--gold-dim); }
 
-        /* Advanced Options */
-        .advanced-options {
-            grid-column: span 4; border-top: 1px dashed var(--border-color); margin-top: 5px; padding-top: 10px;
-            display: grid; grid-template-columns: 1.2fr 1fr; gap: 15px;
-        }
-        .adv-block {
-            display: flex; flex-direction: column; gap: 6px;
-            background: var(--panel-bg); padding: 10px; border-radius: 6px; border: 1px solid var(--border-color);
-        }
-        .adv-title { 
-            font-size: 11px; color: var(--gold-primary); font-weight: 800; text-transform: uppercase; 
-            margin-bottom: 4px; display: flex; justify-content: space-between; align-items: center;
-        }
-
-        /* Sync Matrix */
-        .sync-matrix { display: flex; flex-wrap: wrap; gap: 8px; }
-        .sync-item { 
-            display: flex; align-items: center; gap: 4px; font-size: 11px; 
-            background: var(--input-bg); padding: 3px 8px; border-radius: 4px; border: 1px solid var(--border-color);
-            color: var(--text-dim); transition: 0.2s;
-        }
-        .sync-item:hover { border-color: var(--gold-primary); color: var(--text-main); }
-
-        /* Inputs & Labels */
-        label { font-size: 11px; display: flex; align-items: center; gap: 5px; cursor: pointer; color: var(--text-dim); }
-        label:hover { color: var(--text-main); }
-        input[type="checkbox"], input[type="radio"] { accent-color: var(--gold-primary); cursor: pointer; }
-        
-        input[type="number"] { 
-            background: var(--input-bg); color: var(--gold-primary); border: 1px solid #555; 
-            width: 40px; padding: 2px; text-align: center; font-weight: bold; border-radius: 4px;
-        }
-        input[type="number"]:focus { border-color: var(--gold-primary); outline: none; }
-
-        /* Actions */
-        .col-actions { display: flex; flex-direction: column; gap: 8px; justify-content: center; }
         .btn {
             background: var(--input-bg); color: var(--text-main); border: 1px solid var(--border-color);
-            padding: 8px; cursor: pointer; font-weight: 600; font-size: 12px;
+            padding: 0 12px; height: 32px; /* Touch friendly */
+            cursor: pointer; font-weight: 600; font-size: 12px;
             border-radius: 6px; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 6px;
+            white-space: nowrap;
         }
-        .btn:hover { transform: translateY(-2px); box-shadow: var(--shadow-hover); border-color: var(--gold-primary); }
+        .btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-hover); border-color: var(--gold-primary); }
         .btn-primary { background: linear-gradient(135deg, #a01a1a, #680e0e); color: white; border: none; }
         [data-theme="light"] .btn-primary { background: linear-gradient(135deg, #d32f2f, #b71c1c); }
         .btn-success { background: linear-gradient(135deg, #2e7d32, #1b5e20); color: white; border: none; }
@@ -167,19 +157,63 @@
         .btn-teal { background: linear-gradient(135deg, #00838f, #006064); color: white; border: none; }
         .btn-patch { background: linear-gradient(135deg, #424242, #212121); border: 1px solid var(--gold-dim); color: var(--gold-primary); }
 
+        /* Config Grid - Responsive */
+        .config-grid {
+            display: grid; 
+            /* Auto-fit magic: fitting as many as possible with min-width */
+            grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); 
+            gap: 8px;
+            background: var(--input-bg); padding: 8px; border-radius: 8px; border: 1px solid var(--border-color);
+        }
+        .config-group { display: flex; flex-direction: column; gap: 2px; }
+        .head { font-size: 11px; font-weight: bold; color: var(--text-dim); border-bottom: 1px solid var(--border-color); margin-bottom: 2px; display: flex; align-items: center; gap: 4px; white-space: nowrap;}
+        .head i { width: 14px; text-align: center; color: var(--gold-primary); font-size: 10px;}
+        
+        label { font-size: 11px; display: flex; align-items: center; gap: 4px; cursor: pointer; color: var(--text-dim); white-space: nowrap; user-select: none;}
+        label:hover { color: var(--text-main); }
+        input[type="checkbox"], input[type="radio"] { accent-color: var(--gold-primary); cursor: pointer; width: 14px; height: 14px; margin: 0;}
+
+        /* Advanced Options */
+        .advanced-options {
+            border-top: 1px dashed var(--border-color); margin-top: 5px; padding-top: 8px;
+            display: flex; gap: 10px; 
+            overflow-x: auto; /* Scroll horizontally on small screens */
+            padding-bottom: 5px; /* Space for scrollbar */
+        }
+        .adv-block {
+            display: flex; flex-direction: column; gap: 4px; flex: 1;
+            background: var(--panel-bg); padding: 8px; border-radius: 6px; border: 1px solid var(--border-color);
+            min-width: 240px; 
+        }
+        .adv-title { font-size: 11px; color: var(--gold-primary); font-weight: 800; text-transform: uppercase; border-bottom: 1px solid var(--border-color); padding-bottom: 2px; margin-bottom: 2px; }
+        .sync-matrix { display: flex; flex-wrap: wrap; gap: 5px; }
+        .sync-item { 
+            display: flex; align-items: center; gap: 3px; font-size: 10px; 
+            background: var(--input-bg); padding: 4px 6px; border-radius: 4px; border: 1px solid var(--border-color);
+            color: var(--text-dim); flex-grow: 1; justify-content: center;
+        }
+        input[type="number"] { width: 40px; padding: 1px; text-align: center; font-size: 11px; font-weight: bold; background: var(--input-bg); border: 1px solid var(--border-color); color:var(--gold-primary); border-radius:3px; }
+
         /* Filter Bar */
-        .filter-bar { display: flex; gap: 4px; padding: 0 10px; align-items: flex-end; }
+        .filter-bar { 
+            display: flex; gap: 4px; padding: 0 5px; align-items: flex-end; flex-shrink: 0; 
+            overflow-x: auto; /* Scrollable tabs */
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: 2px;
+        }
         .tab-btn {
             background: var(--input-bg); border: 1px solid var(--border-color); border-bottom: none;
-            color: var(--text-dim); padding: 8px 16px; cursor: pointer; font-size: 11px; font-weight: bold;
-            border-radius: 6px 6px 0 0; transition: 0.2s; display: flex; align-items: center; gap: 5px;
+            color: var(--text-dim); padding: 8px 12px; cursor: pointer; font-size: 11px; font-weight: bold;
+            border-radius: 6px 6px 0 0; transition: 0.2s; display: flex; align-items: center; gap: 5px; white-space: nowrap;
+            flex-shrink: 0; /* Don't shrink tabs */
         }
+        .tab-btn:hover { background: var(--panel-bg); color: var(--text-main); }
         .tab-btn.active { 
             background: var(--panel-bg); color: var(--gold-primary); 
             border-top: 3px solid var(--gold-primary); border-bottom: 1px solid var(--panel-bg); 
             z-index: 5; padding-bottom: 10px; margin-top: -2px;
         }
-        .tab-btn[data-cat="all"].active { border-top: 3px solid var(--gold-primary); }
+        /* Active borders */
         .tab-btn[data-cat="unit"].active { border-top-color: var(--tag-unit); color: var(--tag-unit); }
         .tab-btn[data-cat="spell"].active { border-top-color: var(--tag-spell); color: var(--tag-spell); }
         .tab-btn[data-cat="item"].active { border-top-color: var(--tag-item); color: var(--tag-item); }
@@ -190,75 +224,155 @@
 
         .search-container {
             margin-left: auto; display: flex; align-items: center; gap: 8px; 
-            background: var(--input-bg); padding: 5px 12px; 
-            border-radius: 16px 16px 0 0; border: 1px solid var(--border-color); border-bottom: none;
+            background: var(--input-bg); padding: 4px 10px; height: 30px;
+            border-radius: 12px 12px 0 0; border: 1px solid var(--border-color); border-bottom: none;
+            flex-shrink: 0;
+            position: sticky; right: 0; z-index: 10;
         }
-        .search-input { background: transparent; border: none; color: var(--text-main); width: 140px; font-size: 12px; outline: none; }
-        .search-input:focus { width: 200px; }
-        .counter { font-size: 11px; color: var(--text-dim); }
-        .filter-select { background: transparent; border: none; color: var(--text-dim); font-size: 12px; outline: none; cursor: pointer; border-right: 1px solid var(--border-color); padding-right: 8px; margin-right: 5px; }
+        .search-input { width: 120px; font-size: 12px; border:none; background:transparent;}
+        .search-input:focus { width: 150px; outline:none;}
+        .filter-select { background: transparent; border: none; color: var(--text-dim); font-size: 11px; outline: none; cursor: pointer; border-right: 1px solid var(--border-color); padding-right: 8px; margin-right: 5px; width: auto;}
         .filter-select option { background: var(--input-bg); color: var(--text-main); }
+        .counter { font-size: 10px; color: var(--text-dim); white-space: nowrap;}
 
-        /* Table */
-        .table-wrap { flex: 1; overflow-y: auto; border: 1px solid var(--border-color); background: var(--panel-bg); box-shadow: var(--shadow-soft); }
-        table { width: 100%; border-collapse: collapse; font-size: 13px; table-layout: fixed; }
-        th { 
-            background: var(--input-bg); color: var(--gold-primary); padding: 12px; 
-            position: sticky; top: 0; z-index: 10; border-bottom: 2px solid var(--border-color); text-align: left;
+        /* --- Table Area (The Flexible Part) --- */
+        .table-wrap { 
+            flex: 1; 
+            min-height: 0; 
+            overflow: auto; /* Both X and Y scrolling */
+            border: 1px solid var(--border-color); 
+            background: var(--panel-bg); 
+            box-shadow: var(--shadow-soft);
+            display: flex; flex-direction: column;
+            overscroll-behavior: contain; /* Prevent parent scroll chaining */
         }
-        td { padding: 10px 12px; border-bottom: 1px solid var(--border-color); vertical-align: top; color: var(--text-main); line-height: 1.5; word-wrap: break-word; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; table-layout: fixed; }
+        
+        /* Fixed Column Widths for better mobile view */
+        th:nth-child(1) { width: 60px; min-width: 60px; }
+        th:nth-child(2) { width: 90px; min-width: 90px; }
+        th:nth-child(3) { width: 40%; min-width: 250px; } /* Original text needs space */
+        th:nth-child(4) { min-width: 250px; } /* Trans text needs space */
+
+        th { 
+            background: var(--input-bg); color: var(--gold-primary); padding: 10px; 
+            position: sticky; top: 0; z-index: 10; border-bottom: 2px solid var(--border-color); text-align: left;
+            font-size: 11px; white-space: nowrap;
+        }
+        td { padding: 8px 10px; border-bottom: 1px solid var(--border-color); vertical-align: top; color: var(--text-main); line-height: 1.4; word-wrap: break-word; }
         tr:nth-child(even) { background: rgba(128,128,128,0.02); }
         tr:hover { background: var(--gold-glow); }
 
         textarea {
-            width: 97%; background: var(--input-bg); color: var(--text-main);
+            width: 98%; background: var(--input-bg); color: var(--text-main);
             border: 1px solid var(--border-color); border-radius: 4px; padding: 6px;
-            resize: vertical; font-family: inherit; line-height: 1.5; min-height: 36px; overflow: hidden;
+            resize: vertical; font-family: inherit; line-height: 1.4; min-height: 32px; overflow: hidden; font-size: 13px;
+            box-sizing: border-box;
         }
         textarea:focus { border-color: var(--gold-primary); background: var(--panel-bg); box-shadow: 0 0 0 2px var(--gold-glow); outline: none; }
 
-        .badge { padding: 2px 5px; border-radius: 3px; font-size: 10px; color: #fff; font-weight: bold; display: inline-block; min-width: 40px; text-align: center; margin-bottom: 3px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        .badge { padding: 2px 4px; border-radius: 3px; font-size: 9px; color: #fff; font-weight: bold; display: inline-block; min-width: 30px; text-align: center; margin-bottom: 2px; }
         .bg-unit { background: var(--tag-unit); } .bg-spell { background: var(--tag-spell); }
         .bg-item { background: var(--tag-item); } .bg-site { background: var(--tag-site); }
         .bg-event { background: var(--tag-event); } .bg-nation { background: var(--tag-nation); }
         .bg-misc { background: var(--tag-misc); }
         
-        .alert-dupe { color: #ff5252; background: rgba(255,82,82,0.1); border: 1px solid #ff5252; padding: 1px 5px; border-radius: 3px; font-size: 10px; margin-right: 5px; display: inline-flex; align-items: center; gap: 3px; cursor: help;}
+        .alert-dupe { color: #ff5252; background: rgba(255,82,82,0.1); border: 1px solid #ff5252; padding: 1px 4px; border-radius: 3px; font-size: 9px; margin-right: 5px; display: inline-flex; align-items: center; gap: 3px; cursor: help;}
 
         .pagination-bar {
             display: flex; justify-content: space-between; align-items: center;
-            background: var(--input-bg); padding: 8px 20px; border: 1px solid var(--border-color); border-top: none;
-            border-radius: 0 0 8px 8px;
+            background: var(--input-bg); padding: 8px 15px; border: 1px solid var(--border-color); border-top: none;
+            border-radius: 0 0 8px 8px; flex-shrink: 0;
+            font-size: 11px;
         }
+        .page-btn { padding: 5px 15px; cursor: pointer; background: var(--panel-bg); border: 1px solid var(--border-color); color: var(--text-main); border-radius: 4px; }
+        .page-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
         /* Modals */
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 100; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 100; justify-content: center; align-items: center; backdrop-filter: blur(5px); padding: 20px; }
         .modal.active { display: flex; animation: zoomIn 0.2s ease; }
         .modal-box { 
-            background: var(--panel-bg); border: 1px solid var(--gold-dim); padding: 25px; width: 750px; 
+            background: var(--panel-bg); border: 1px solid var(--gold-dim); padding: 20px; 
+            width: 100%; max-width: 750px; 
+            max-height: calc(100vh - 40px); /* Fit within viewport */
+            overflow-y: auto; /* Allow internal scrolling */
             box-shadow: 0 20px 60px rgba(0,0,0,0.6); border-radius: 10px; display: flex; flex-direction: column; gap: 15px;
         }
-        .scope-options { display: flex; gap: 20px; background: var(--input-bg); padding: 12px; border: 1px solid var(--border-color); border-radius: 6px; }
+        .scope-options { display: flex; gap: 20px; background: var(--input-bg); padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 12px; flex-wrap: wrap;}
         
         @keyframes zoomIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
 
         #toast { 
             position: fixed; bottom: 40px; left: 50%; transform: translateX(-50%); 
             background: var(--panel-bg); border-left: 4px solid var(--gold-primary); color: var(--text-main);
-            padding: 12px 30px; opacity: 0; transition: 0.3s; z-index: 200; 
+            padding: 8px 20px; opacity: 0; transition: 0.3s; z-index: 200; font-size: 12px;
             border-radius: 4px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); font-weight: bold;
-            display: flex; align-items: center; gap: 10px;
+            display: flex; align-items: center; gap: 10px; width: max-content; max-width: 90%;
         }
         #toast.show { opacity: 1; bottom: 60px; }
         
         .glossary-group { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+        /* --- RESPONSIVE MEDIA QUERIES --- */
+
+        /* Laptop / Tablet Mode (< 1024px) */
+        @media (max-width: 1024px) {
+            .control-panel {
+                grid-template-columns: 1fr 1fr;
+                grid-template-areas: 
+                    "file actions"
+                    "config config";
+            }
+            .col-file { flex-direction: row; flex-wrap: wrap; align-items: flex-end; }
+            .col-file > * { flex: 1; min-width: 120px; }
+            .col-actions { flex-direction: row; flex-wrap: wrap; align-items: flex-end; }
+            .col-actions > * { flex: 1; min-width: 100px; }
+            .glossary-group { flex: 1; min-width: 140px; }
+        }
+
+        /* Mobile / Portrait Tablet (< 768px) */
+        @media (max-width: 768px) {
+            body { padding: 5px; }
+            .control-panel {
+                display: flex; flex-direction: column;
+                gap: 10px; padding: 10px;
+                max-height: 35vh;
+            }
+            .col-file, .col-actions { flex-direction: row; flex-wrap: wrap; }
+            .col-file .btn, .col-actions .btn { flex-grow: 1; }
+            
+            .header-actions { margin-left: auto; }
+            .header-left h1 { font-size: 18px; }
+
+            .filter-bar { padding-bottom: 0; }
+            .search-container { width: auto; flex-grow: 1; justify-content: flex-end;}
+            .search-input:focus { width: 100px; }
+            
+            /* Prevent input zoom on iOS */
+            select, input, textarea { font-size: 16px !important; }
+            .btn { height: 36px; } /* Larger touch targets */
+            
+            /* Hide advanced options in mobile to save space unless scrolled */
+            .advanced-options { flex-direction: column; min-width: 0; }
+            .adv-block { min-width: 0; }
+        }
+
+        /* Short Screens (Landscape Phones / Weird Laptops) */
+        @media (max-height: 600px) {
+            header { margin-bottom: 5px; padding-bottom: 5px; }
+            .control-panel { max-height: 150px; padding: 5px; margin-bottom: 5px; gap: 5px;}
+            .col-title { font-size: 10px; margin-bottom: 2px; }
+            .config-grid { padding: 2px; gap: 2px; }
+            .btn { height: 24px; font-size: 11px; }
+            textarea { min-height: 24px; }
+        }
     </style>
 </head>
 <body>
 
 <header>
     <div class="header-left">
-        <h1>Dominions 6 Mod 汉化工作台 <span class="version-tag">v3.4</span></h1>
+        <h1>Dom6 汉化台 <span class="version-tag">v3.5</span></h1>
     </div>
     <div class="header-actions">
         <button class="theme-toggle" onclick="toggleTheme()" title="切换日夜模式"><i class="fa-solid fa-moon"></i></button>
@@ -269,20 +383,20 @@
 <div class="control-panel">
     <!-- 1. File -->
     <div class="col-file">
-        <span class="col-title"><i class="fa-solid fa-file-code"></i> 1. 文件操作</span>
+        <span class="col-title"><i class="fa-solid fa-file-code"></i> 文件</span>
         <select id="encodingSelect">
-            <option value="UTF-8">读取编码: UTF-8 (默认)</option>
-            <option value="windows-1252">读取编码: Windows-1252 (旧Mod)</option>
+            <option value="UTF-8">UTF-8</option>
+            <option value="windows-1252">ANSI (旧)</option>
         </select>
         <input type="file" id="fileInput" accept=".dm" style="display:none">
         <button class="btn" onclick="document.getElementById('fileInput').click()">
-            <i class="fa-solid fa-folder-open"></i> 上传 .dm 文件
+            <i class="fa-solid fa-folder-open"></i> 上传 .dm
         </button>
     </div>
 
     <!-- 2. Config -->
     <div class="col-config" style="grid-column: span 1;">
-        <span class="col-title"><i class="fa-solid fa-sliders"></i> 2. 翻译范围配置</span>
+        <span class="col-title"><i class="fa-solid fa-sliders"></i> 配置</span>
         <div class="config-grid">
             <div class="config-group"><div class="head"><i class="fa-solid fa-hat-wizard"></i> 法术</div><label><input type="checkbox" id="cfg_spell_name"> Name</label><label><input type="checkbox" id="cfg_spell_descr" checked> Descr</label></div>
             <div class="config-group"><div class="head"><i class="fa-solid fa-chess-knight"></i> 单位</div><label><input type="checkbox" id="cfg_unit_name"> Name</label><label><input type="checkbox" id="cfg_unit_descr" checked> Descr</label></div>
@@ -296,7 +410,7 @@
             <div class="advanced-options">
                 <div class="adv-block">
                     <div class="adv-title">
-                        <span><i class="fa-solid fa-link"></i> 全局同步 (Global Sync)</span>
+                        <span><i class="fa-solid fa-link"></i> 全局同步</span>
                         <label style="font-weight:normal; margin:0;"><input type="checkbox" id="opt_global_sync" checked onclick="toggleSyncMatrix(this)"> 总开关</label>
                     </div>
                     <div class="sync-matrix">
@@ -306,39 +420,32 @@
                         <label class="sync-item"><input type="checkbox" id="sync_site_name" checked> 遗迹</label>
                         <label class="sync-item"><input type="checkbox" id="sync_event_name" checked> 事件</label>
                         <label class="sync-item"><input type="checkbox" id="sync_misc_name" checked> 杂项</label>
-                        <div style="width:100%; height:1px; background:var(--border-color); margin:2px 0;"></div>
-                        <label class="sync-item" style="color:var(--tag-nation)"><input type="checkbox" id="sync_nation_name" checked> 国家名</label>
+                        <label class="sync-item" style="color:var(--tag-nation)"><input type="checkbox" id="sync_nation_name" checked> 国家</label>
                         <label class="sync-item" style="color:var(--tag-nation)"><input type="checkbox" id="sync_nation_epithet"> 称号</label>
                     </div>
                 </div>
                 <div class="adv-block">
                     <div class="adv-title">
-                        <span><i class="fa-solid fa-align-left"></i> 格式与过滤 (Format)</span>
+                        <span><i class="fa-solid fa-align-left"></i> 格式与过滤</span>
                     </div>
-                    <div style="display:flex; align-items:center; gap:8px; margin-bottom:5px;">
+                    <div style="display:flex; align-items:center; gap:5px; margin-bottom:5px; flex-wrap:wrap;">
                         <input type="checkbox" id="opt_auto_wrap" checked style="accent-color:#ff4444">
-                        <span style="font-size:12px; color:var(--text-dim)">强制换行字数:</span>
-                        <div style="display:flex; gap:5px; flex-wrap:wrap;">
-                            <label title="国家Info/Brief">国:<input type="number" id="limit_nation" value="55"></label>
-                            <label title="法术Descr">法:<input type="number" id="limit_spell" value="36"></label>
-                            <label title="事件Msg">事:<input type="number" id="limit_event" value="35"></label>
-                            <label title="物品Descr">物:<input type="number" id="limit_item" value="30"></label>
-                            <label title="单位/其他">他:<input type="number" id="limit_other" value="42"></label>
-                        </div>
+                        <span style="font-size:11px; color:var(--text-dim)">强制换行:</span>
+                        <label title="国家Info/Brief">国:<input type="number" id="limit_nation" value="55"></label>
+                        <label title="法术Descr">法:<input type="number" id="limit_spell" value="36"></label>
+                        <label title="事件Msg">事:<input type="number" id="limit_event" value="35"></label>
+                        <label title="物品Descr">物:<input type="number" id="limit_item" value="30"></label>
+                        <label title="单位/其他">他:<input type="number" id="limit_other" value="42"></label>
                     </div>
-                    <div style="border-top:1px solid var(--border-color); padding-top:5px; display:flex; flex-direction:column; gap:3px;">
-                        <div style="display:flex; justify-content:space-between; align-items:center;">
-                             <span style="font-size:11px; color:var(--gold-primary); font-weight:800;">保留原文段落:</span>
+                    <div style="border-top:1px solid var(--border-color); padding-top:4px; display:flex; flex-direction:column; gap:2px;">
+                        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                             <label title="保留#descr中的硬回车"><input type="checkbox" id="opt_keep_para_descr" checked> 保留段落(常)</label>
+                             <label title="保留#msg/#text中的硬回车"><input type="checkbox" id="opt_keep_para_event" checked> 保留段落(事)</label>
                         </div>
-                        <div style="display:flex; gap:10px;">
-                             <label title="开启后保留#descr中的硬回车(列表格式)，关闭则合并为一段"><input type="checkbox" id="opt_keep_para_descr" checked> 常规描述</label>
-                             <label title="开启后保留#msg/#text中的硬回车"><input type="checkbox" id="opt_keep_para_event" checked> 事件文本</label>
-                        </div>
-                        <div style="height:1px; background:var(--border-color); margin:2px 0;"></div>
-                        <label title="即使不翻译，也对原文进行强制换行处理"><input type="checkbox" id="opt_force_reformat"> 强制重排原文</label>
-                        <div style="display:flex; gap:15px;">
-                            <label title="忽略重名条目"><input type="checkbox" id="opt_ignore_dupes" style="accent-color:#ff4444"> 🚫 忽略重名条目</label>
-                            <label title="忽略原文中包含[]的条目"><input type="checkbox" id="opt_ignore_brackets"> 🚫 忽略含 [ ]</label>
+                        <div style="display:flex; gap:10px; margin-top:2px; flex-wrap:wrap;">
+                            <label title="强制重排"><input type="checkbox" id="opt_force_reformat"> 强制重排</label>
+                            <label title="忽略重名条目"><input type="checkbox" id="opt_ignore_dupes" style="accent-color:#ff4444"> 🚫 忽略重名</label>
+                            <label title="忽略[]内容"><input type="checkbox" id="opt_ignore_brackets"> 🚫 忽略[]</label>
                         </div>
                     </div>
                 </div>
@@ -348,22 +455,21 @@
 
     <!-- 3. Actions -->
     <div class="col-actions">
-        <span class="col-title" style="text-align:center"><i class="fa-solid fa-bolt"></i> 3. 执行操作</span>
+        <span class="col-title" style="text-align:center"><i class="fa-solid fa-bolt"></i> 操作</span>
         <button class="btn btn-purple" onclick="openAIPromptModal()"><i class="fa-solid fa-brain"></i> AI 提示词</button>
         <button class="btn btn-success" onclick="document.getElementById('importModal').classList.add('active')"><i class="fa-solid fa-file-import"></i> 导入翻译</button>
         
-        <!-- Dictionary Group -->
         <div class="glossary-group">
-            <button class="btn btn-teal" onclick="exportGlossary()"><i class="fa-solid fa-file-export"></i> 导出词库</button>
+            <button class="btn btn-teal" onclick="exportGlossary()"><i class="fa-solid fa-file-export"></i> 导词库</button>
             <input type="file" id="glossaryInput" accept=".json" style="display:none">
-            <button class="btn btn-teal" onclick="document.getElementById('glossaryInput').click()"><i class="fa-solid fa-book"></i> 导入词库</button>
+            <button class="btn btn-teal" onclick="document.getElementById('glossaryInput').click()"><i class="fa-solid fa-book"></i> 导词库</button>
         </div>
 
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:8px;">
-            <button class="btn btn-fix" onclick="autoFixSwappedNames()"><i class="fa-solid fa-wand-magic-sparkles"></i> 智能修复</button>
-            <button class="btn btn-patch" onclick="generatePatchMod()" title="生成只包含select指令和翻译的补丁Mod"><i class="fa-solid fa-bandage"></i> 生成补丁</button>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:5px;">
+            <button class="btn btn-fix" onclick="autoFixSwappedNames()"><i class="fa-solid fa-wand-magic-sparkles"></i> 修复</button>
+            <button class="btn btn-patch" onclick="generatePatchMod()" title="生成补丁Mod"><i class="fa-solid fa-bandage"></i> 补丁</button>
         </div>
-        <button class="btn btn-primary" onclick="generateModFile()"><i class="fa-solid fa-download"></i> 生成完整 Mod</button>
+        <button class="btn btn-primary" onclick="generateModFile()"><i class="fa-solid fa-download"></i> 生成 Mod</button>
     </div>
 </div>
 
@@ -380,13 +486,13 @@
 
     <div class="search-container">
         <select class="filter-select" id="langFilter" onchange="filterData()" title="筛选状态">
-            <option value="all">🌐 所有</option>
-            <option value="has_cn">🇨🇳 含中</option>
-            <option value="no_cn">⬜ 纯外</option>
-            <option value="dupes">⚠️ 重名</option>
+            <option value="all">🌐 全</option>
+            <option value="has_cn">🇨🇳 中</option>
+            <option value="no_cn">⬜ 外</option>
+            <option value="dupes">⚠️ 重</option>
         </select>
         <i class="fa-solid fa-magnifying-glass" style="color:var(--text-dim)"></i>
-        <input type="text" class="search-input" id="searchInput" placeholder="搜索 ID / 原文 / 指令..." oninput="filterData()">
+        <input type="text" class="search-input" id="searchInput" placeholder="搜索..." oninput="filterData()">
         <div class="counter" id="rowCounter">0 / 0</div>
     </div>
 </div>
@@ -395,38 +501,38 @@
     <table id="dataTable">
         <thead>
             <tr>
-                <th width="80">ID / 上下文</th>
-                <th width="100">指令</th>
-                <th width="40%">原文</th>
-                <th>译文 (Auto-Height)</th>
+                <th>ID</th>
+                <th>指令</th>
+                <th>原文</th>
+                <th>译文</th>
             </tr>
         </thead>
         <tbody id="tableBody">
-            <tr><td colspan="4" style="text-align:center; padding:60px; color:var(--text-dim);"><i class="fa-solid fa-cloud-arrow-up" style="font-size:40px; margin-bottom:10px;"></i><br>请上传 .dm 文件开始工作...</td></tr>
+            <tr><td colspan="4" style="text-align:center; padding:60px; color:var(--text-dim);"><i class="fa-solid fa-cloud-arrow-up" style="font-size:40px; margin-bottom:10px;"></i><br>请上传 .dm 文件</td></tr>
         </tbody>
     </table>
 </div>
 
 <div class="pagination-bar">
-    <div class="page-info" id="pageInfo">第 1 / 1 页 (0 条)</div>
+    <div class="page-info" id="pageInfo">1 / 1 (0)</div>
     <div class="page-ctrls">
-        <button class="page-btn" id="prevBtn" onclick="changePage(-1)">◀ 上一页</button>
-        <button class="page-btn" id="nextBtn" onclick="changePage(1)">下一页 ▶</button>
+        <button class="page-btn" id="prevBtn" onclick="changePage(-1)">◀</button>
+        <button class="page-btn" id="nextBtn" onclick="changePage(1)">▶</button>
     </div>
 </div>
 
 <!-- Modals -->
 <div id="aiPromptModal" class="modal">
     <div class="modal-box">
-        <h3 style="color:var(--text-main)"><span><i class="fa-solid fa-robot"></i> AI 提示词生成</span><span id="aiCount" style="font-size:12px; color:var(--text-dim); font-weight:normal;"></span></h3>
+        <h3 style="color:var(--text-main)"><span><i class="fa-solid fa-robot"></i> AI 提示词</span><span id="aiCount" style="font-size:12px; color:var(--text-dim); font-weight:normal;"></span></h3>
         <div class="scope-options">
             <span style="color:var(--text-dim); font-size:12px; font-weight:bold; align-self:center;">范围：</span>
-            <label><input type="radio" name="aiScope" value="all" checked onchange="regenerateAIPrompt()"> 导出所有未翻译</label>
-            <label><input type="radio" name="aiScope" value="filtered" onchange="regenerateAIPrompt()"> 仅当前筛选</label>
+            <label><input type="radio" name="aiScope" value="all" checked onchange="regenerateAIPrompt()"> 所有未翻</label>
+            <label><input type="radio" name="aiScope" value="filtered" onchange="regenerateAIPrompt()"> 仅当前</label>
         </div>
-        <textarea id="aiPromptText" style="height:300px; color:var(--text-main); border-color:var(--gold-dim);" readonly></textarea>
-        <div style="text-align:right; display:flex; justify-content:flex-end; gap:10px;">
-            <button class="btn btn-purple" onclick="copyAIPrompt()"><i class="fa-regular fa-copy"></i> 复制内容</button>
+        <textarea id="aiPromptText" style="height:300px; color:var(--text-main); border-color:var(--gold-dim); flex-grow: 1;" readonly></textarea>
+        <div style="text-align:right; display:flex; justify-content:flex-end; gap:10px; margin-top: auto;">
+            <button class="btn btn-purple" onclick="copyAIPrompt()"><i class="fa-regular fa-copy"></i> 复制</button>
             <button class="btn" onclick="document.getElementById('aiPromptModal').classList.remove('active')">关闭</button>
         </div>
     </div>
@@ -434,10 +540,10 @@
 
 <div id="importModal" class="modal">
     <div class="modal-box">
-        <h3 style="color:var(--gold-primary);"><i class="fa-solid fa-paste"></i> 导入翻译结果</h3>
-        <textarea id="pasteArea" style="height:350px;" placeholder="请在此处粘贴 AI 返回的内容 (Ctrl+V)..."></textarea>
-        <div style="text-align:right; display:flex; justify-content:flex-end; gap:10px;">
-            <button class="btn btn-primary" onclick="processImport()"><i class="fa-solid fa-check"></i> 确认导入</button>
+        <h3 style="color:var(--gold-primary);"><i class="fa-solid fa-paste"></i> 导入翻译</h3>
+        <textarea id="pasteArea" style="height:350px; flex-grow: 1;" placeholder="粘贴 AI 内容..."></textarea>
+        <div style="text-align:right; display:flex; justify-content:flex-end; gap:10px; margin-top: auto;">
+            <button class="btn btn-primary" onclick="processImport()"><i class="fa-solid fa-check"></i> 确认</button>
             <button class="btn" onclick="document.getElementById('importModal').classList.remove('active')">关闭</button>
         </div>
     </div>
@@ -526,7 +632,7 @@
     });
 
     function exportGlossary() {
-        if(!extractedData.length) return showToast("没有数据可导出");
+        if(!extractedData.length) return showToast("没有数据");
         let glossary = {};
         let count = 0;
         extractedData.forEach(d => {
@@ -535,16 +641,14 @@
                 count++;
             }
         });
-        
-        if(count === 0) return showToast("当前没有任何翻译内容");
-
+        if(count === 0) return showToast("无内容导出");
         const jsonStr = JSON.stringify(glossary, null, 2);
         const blob = new Blob([jsonStr], {type: "application/json;charset=utf-8"});
         const a = document.createElement("a");
         a.href = URL.createObjectURL(blob);
         a.download = `Dom6_Glossary_${new Date().toISOString().slice(0,10)}.json`;
         a.click();
-        showToast(`已导出词库，包含 ${count} 条目`);
+        showToast(`已导出 ${count} 条目`);
     }
 
     // --- Parser ---
@@ -652,7 +756,7 @@
                 }
             }
         }
-        if(fixCount > 0) { showToast(`已智能修复 ${fixCount} 处错位！`); renderTable(); } else { showToast("未检测到明显的错位"); }
+        if(fixCount > 0) { showToast(`已修复 ${fixCount} 处错位`); renderTable(); } else { showToast("未检测到明显错位"); }
     }
 
     function setFilter(cat) {
@@ -704,7 +808,7 @@
         const tbody = document.getElementById('tableBody');
         const totalItems = filteredIndices.length;
         const maxPage = Math.ceil(totalItems / itemsPerPage) || 1;
-        document.getElementById('pageInfo').innerText = `第 ${currentPage} / ${maxPage} 页 (总计: ${totalItems})`;
+        document.getElementById('pageInfo').innerText = `第 ${currentPage} / ${maxPage} 页 (总: ${totalItems})`;
         document.getElementById('prevBtn').disabled = currentPage === 1;
         document.getElementById('nextBtn').disabled = currentPage === maxPage || totalItems === 0;
         
@@ -717,12 +821,12 @@
         let html = "";
         pageIndices.forEach(idx => {
             const d = extractedData[idx];
-            const warn = d.isDupe ? `<span class="alert-dupe" title="重名引用"><i class="fa-solid fa-triangle-exclamation"></i> 引用</span>` : '';
+            const warn = d.isDupe ? `<span class="alert-dupe" title="重名"><i class="fa-solid fa-triangle-exclamation"></i></span>` : '';
             let displayOrig = escapeHtml(d.orig).replace(/\n/g, '<br><span style="color:var(--gold-dim)">↵</span>');
             html += `<tr>
-                <td><span class="badge ${d.type.c}">${d.type.l}</span><div style="font-size:10px; color:var(--text-dim); margin-top:4px;">${d.ctxId}</div></td>
+                <td><span class="badge ${d.type.c}">${d.type.l}</span><div style="font-size:10px; color:var(--text-dim); margin-top:2px;">${d.ctxId}</div></td>
                 <td style="color:var(--text-dim); font-family:monospace; font-weight:bold;">${d.cmd}</td>
-                <td style="color:var(--text-dim); font-size:13px;">${warn}${displayOrig}</td>
+                <td style="color:var(--text-dim); font-size:12px;">${warn}${displayOrig}</td>
                 <td><textarea id="t_${d.id}" oninput="autoResize(this); updateTrans(${d.id}, this.value)" onfocus="autoResize(this)">${d.trans}</textarea></td>
             </tr>`;
         });
@@ -803,7 +907,7 @@
         const limitNation = parseInt(document.getElementById('limit_nation').value) || 55;
         const limitSpell = parseInt(document.getElementById('limit_spell').value) || 36;
         const limitEvent = parseInt(document.getElementById('limit_event').value) || 35;
-        const limitItem = parseInt(document.getElementById('limit_item').value) || 30; // New
+        const limitItem = parseInt(document.getElementById('limit_item').value) || 30; 
         const limitOther = parseInt(document.getElementById('limit_other').value) || 42;
 
         extractedData.forEach(d => {
@@ -821,7 +925,7 @@
                 if (d.type.cat === 'nation') limit = limitNation;
                 else if (d.type.cat === 'spell') limit = limitSpell;
                 else if (d.type.cat === 'event') limit = limitEvent;
-                else if (d.type.cat === 'item') limit = limitItem; // New
+                else if (d.type.cat === 'item') limit = limitItem; 
 
                 let isEventText = ['#msg', '#text', '#killermsg'].includes(d.cmd);
                 let keepPara = isEventText ? keepParaEvent : keepParaDescr;
@@ -874,7 +978,7 @@
         const limitNation = parseInt(document.getElementById('limit_nation').value) || 55;
         const limitSpell = parseInt(document.getElementById('limit_spell').value) || 36;
         const limitEvent = parseInt(document.getElementById('limit_event').value) || 35;
-        const limitItem = parseInt(document.getElementById('limit_item').value) || 30; // New
+        const limitItem = parseInt(document.getElementById('limit_item').value) || 30; 
         const limitOther = parseInt(document.getElementById('limit_other').value) || 42;
 
         extractedData.forEach(d => {
@@ -889,7 +993,7 @@
                     if (d.type.cat === 'nation') limit = limitNation;
                     else if (d.type.cat === 'spell') limit = limitSpell;
                     else if (d.type.cat === 'event') limit = limitEvent;
-                    else if (d.type.cat === 'item') limit = limitItem; // New
+                    else if (d.type.cat === 'item') limit = limitItem; 
 
                     let isEventText = ['#msg', '#text', '#killermsg'].includes(d.cmd);
                     let keepPara = isEventText ? keepParaEvent : keepParaDescr;
